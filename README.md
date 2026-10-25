@@ -30,13 +30,6 @@ Open the live demo above, or download `index.html` and open it in any browser. N
 
 Each claim in the tool carries a source key (e.g. [K1], [M4], [N3]) resolved in the "Sources" section at the bottom of the page.
 
-## Version history
-
-- v1.0 — First trilingual release (2025-10)
-- v1.1 — Title casing fix
-- v1.2 — Source attribution fixes (Stationeria nationality), header alignment
-- v1.3 — Color options consolidated into a single "solid" category
-- v1.4 — Added tagline; GitHub Pages deployment
 
 ## Author
 
