@@ -1,0 +1,1730 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>rOtring Tikky Cross-Dating v1.3 by STH</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='10' fill='none' stroke='%23E03A2F' stroke-width='5'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%23E03A2F'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap">
+<style>
+:root{
+  --paper:#ECEAE3;
+  --paper-deep:#E2DFD5;
+  --ink:#1B1D22;
+  --ink-2:#4A4E58;
+  --ink-3:#7A7E88;
+  --line:#C9C5B9;
+  --line-strong:#A9A495;
+  --red:#E03A2F;
+  --red-deep:#B8271E;
+  --amber:#9A5B13;
+  --white:#FFFFFF;
+  --ok:#1E6E52;
+  --mono:ui-monospace,"Cascadia Mono","Consolas",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  background:
+    radial-gradient(circle at 15% 8%, rgba(224,58,47,.05), transparent 32%),
+    var(--paper);
+  color:var(--ink);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:"";
+  position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(27,29,34,.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(27,29,34,.035) 1px, transparent 1px);
+  background-size:28px 28px;
+}
+.wrap{max-width:1080px;margin:0 auto;padding:0 18px}
+
+/* ===== header ===== */
+header{
+  border-bottom:1px solid var(--line);
+  background:rgba(236,234,227,.85);
+  backdrop-filter:blur(6px);
+  position:sticky;top:0;z-index:20;
+}
+.header-inner{display:flex;align-items:center;gap:16px;padding:14px 18px}
+.logo-ring{flex:0 0 auto;width:44px;height:44px}
+.logo-ring circle{animation:ring 6s linear infinite}
+@keyframes ring{to{transform:rotate(360deg);transform-origin:center}}
+.logo-text h1{font-size:30px;font-weight:900;letter-spacing:.5px}
+.logo-text p{font-size:12px;color:var(--ink-2);margin-top:2px}
+.meta-chip{
+  margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:3px;
+  font-family:var(--mono);font-size:11px;color:var(--ink-2);
+  border:1px solid var(--line-strong);border-radius:10px;padding:4px 10px;white-space:nowrap;
+}
+.lang-switch{
+  display:flex;gap:2px;background:var(--paper-deep);border:1px solid var(--line-strong);
+  border-radius:999px;padding:2px;flex:0 0 auto;
+}
+.lang-btn{
+  appearance:none;background:transparent;border:none;font-family:inherit;
+  font-size:11.5px;color:var(--ink-3);padding:4px 10px;border-radius:999px;cursor:pointer;
+}
+.lang-btn[aria-pressed="true"]{background:var(--ink);color:#fff;font-weight:700}
+
+/* ===== hero ===== */
+.hero{padding:26px 0 10px}
+.hero h2{font-size:26px;font-weight:900;line-height:1.35}
+.hero p{color:var(--ink-2);font-size:14px;margin-top:8px;max-width:640px}
+
+/* ===== selector ===== */
+.selector{
+  margin:20px 0 0;
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:20px 18px 18px;
+  box-shadow:0 1px 0 rgba(27,29,34,.04);
+}
+.step{margin-bottom:18px}
+.step:last-of-type{margin-bottom:12px}
+.step-head{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+.step-no{
+  font-family:var(--mono);font-size:12px;font-weight:700;color:var(--red);
+  border:1px solid var(--red);border-radius:4px;padding:1px 6px;
+}
+.step-title{font-size:15px;font-weight:700}
+.step-sub{font-size:12px;color:var(--ink-3)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips.rare{margin-top:10px}
+.chips.hidden{display:none}
+.chip-toggle{
+  margin-top:10px;appearance:none;background:transparent;border:none;
+  color:var(--ink-3);font-size:12px;font-family:inherit;cursor:pointer;
+  padding:6px 0;display:inline-flex;align-items:center;gap:6px;
+}
+.chip-toggle:hover{color:var(--ink)}
+.chip-toggle-arrow{display:inline-block;transition:transform .2s}
+.chip-toggle[aria-expanded="true"] .chip-toggle-arrow{transform:rotate(180deg)}
+.chip{
+  appearance:none;border:1px solid var(--line-strong);background:var(--white);
+  color:var(--ink);font-size:13px;line-height:1.2;
+  padding:10px 14px;border-radius:8px;cursor:pointer;min-height:44px;
+  transition:border-color .15s,color .15s,background .15s,transform .05s;
+  font-family:inherit;
+}
+.chip:hover{border-color:var(--ink-2)}
+.chip:active{transform:scale(.98)}
+.chip[aria-pressed="true"]{
+  border-color:var(--red);background:var(--red);color:#fff;font-weight:500;
+}
+.chip.is-warn[aria-pressed="true"]{border-color:var(--amber);background:var(--amber)}
+.chip.is-disabled,.chip:disabled{
+  opacity:.4;cursor:not-allowed;border-style:dashed;color:var(--ink-3);
+  background:var(--paper);
+}
+.chip.is-disabled:hover,.chip:disabled:hover{border-color:var(--line-strong);transform:none}
+.reset{
+  appearance:none;background:transparent;border:1px dashed var(--line-strong);
+  color:var(--ink-2);font-size:13px;border-radius:8px;padding:8px 16px;cursor:pointer;
+  min-height:44px;font-family:inherit;
+}
+.reset:hover{color:var(--red);border-color:var(--red)}
+
+/* ===== result ===== */
+.result{
+  margin-top:16px;border:1px solid var(--line);border-radius:10px;
+  background:var(--white);overflow:hidden;
+}
+.result-pad{padding:20px 18px}
+.result-empty{color:var(--ink-3);font-size:14px;text-align:center;padding:8px 0}
+.result-kicker{
+  font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--red);
+  text-transform:uppercase;margin-bottom:8px;
+}
+.result-years{
+  font-size:40px;font-weight:900;letter-spacing:1px;line-height:1.15;
+  font-family:var(--mono);
+}
+.result-years small{font-size:16px;color:var(--ink-3);font-weight:400;margin-left:6px}
+.result-detail{margin-top:14px;border-top:1px solid var(--line);padding-top:14px}
+.detail-row{display:flex;gap:10px;padding:7px 0;font-size:13.5px;border-bottom:1px dashed var(--line)}
+.detail-row:last-child{border-bottom:none}
+.detail-key{flex:0 0 84px;color:var(--ink-3);font-size:12.5px;padding-top:2px}
+.detail-val{flex:1;color:var(--ink)}
+.detail-val .src{font-size:11.5px;color:var(--ink-3)}
+.note-line{margin-top:12px;background:var(--paper);border-left:3px solid var(--amber);
+  padding:10px 12px;font-size:12.5px;color:var(--amber);border-radius:0 6px 6px 0}
+.note-line strong{font-weight:700}
+.tag-ref{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.5px;
+  color:var(--amber);border:1px solid var(--amber);border-radius:4px;padding:0 5px;margin-left:6px;vertical-align:1px}
+.conflict-line{margin-top:10px;background:#FBF0E8;border-left:3px solid var(--red);
+  padding:10px 12px;font-size:12.5px;color:var(--red-deep);border-radius:0 6px 6px 0}
+.conflict-line-item{font-size:12.5px;color:var(--red-deep);padding:3px 0;font-family:var(--mono)}
+
+/* ===== sections ===== */
+.section{margin-top:34px}
+.section-title{font-size:17px;font-weight:900;display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.section-title::before{content:"";width:10px;height:10px;background:var(--red);border-radius:2px;flex:0 0 auto}
+.section-sub{color:var(--ink-2);font-size:13px;margin-bottom:16px}
+
+/* clip rule card */
+.rule-grid{display:grid;grid-template-columns:1fr;gap:10px}
+.rule-card{
+  background:var(--white);border:1px solid var(--line);border-radius:8px;
+  padding:12px 14px;display:flex;align-items:center;gap:14px;
+}
+.rule-mark{
+  flex:0 0 132px;width:132px;min-height:46px;display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:12px;font-weight:700;line-height:1.35;text-align:center;
+  background:var(--ink);color:#fff;border-radius:6px;padding:8px 10px;
+}
+.rule-mark.blank{background:var(--ink);color:#fff;border:none}
+.rule-mark.wg{background:var(--ink)}
+.rule-info{flex:1;min-width:0}
+.rule-info b{display:block;font-size:13.5px}
+.rule-info span{font-size:12.5px;color:var(--ink-2)}
+.rule-arrow{flex:0 0 auto;color:var(--ink-3);font-size:13px;text-align:right}
+
+/* 口径切换 + 参考表 */
+.theory-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 12px}
+.theory-bar .label{font-size:12.5px;color:var(--ink-2)}
+.theory-btn{
+  appearance:none;border:1px solid var(--line-strong);background:var(--white);color:var(--ink);
+  font-family:inherit;font-size:12.5px;padding:7px 12px;border-radius:999px;cursor:pointer;min-height:38px;
+}
+.theory-btn[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.theory-hint{font-size:12px;color:var(--ink-3)}
+.ref-table{width:100%;border-collapse:collapse;font-size:12.5px;background:var(--white);
+  border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.ref-table th,.ref-table td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line)}
+.ref-table th{background:var(--paper-deep);font-size:12px;color:var(--ink-2);font-weight:700}
+.ref-table tr:last-child td{border-bottom:none}
+.ref-table td.mono{font-family:var(--mono)}
+
+/* notes */
+.notes-box{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:18px}
+.notes-box ul{list-style:none}
+.notes-box li{
+  padding:7px 0 7px 20px;position:relative;font-size:13px;color:var(--ink-2);border-bottom:1px dashed var(--line);
+}
+.notes-box li:last-child{border-bottom:none}
+.notes-box li::before{
+  content:"";position:absolute;left:2px;top:15px;width:7px;height:7px;border:2px solid var(--red);border-radius:50%;
+}
+
+/* sources */
+.sources{background:var(--ink);color:#D8D6CE;border-radius:10px;padding:20px 18px;margin-bottom:40px}
+.sources h3{color:#fff;font-size:15px;margin-bottom:12px}
+.sources .src-note{margin-top:10px;color:#A9A69E;font-size:12px;line-height:1.7}
+.sources .src-relation{margin-top:8px;color:#A9A69E;font-size:12px;line-height:1.7}
+.src-list{list-style:none;font-size:12.5px;line-height:1.8}
+.src-list li{padding:4px 0;display:flex;gap:10px}
+.src-list .idx{font-family:var(--mono);color:var(--red);flex:0 0 22px}
+.src-list a{color:#B9C6D6;word-break:break-all}
+.src-list a:hover{color:#fff}
+.src-note{color:#8E928F;font-size:12px;margin-top:10px;line-height:1.7}
+
+footer{padding:16px 0 34px;text-align:center;color:var(--ink-3);font-size:12px}
+
+@media (min-width:768px){
+  .header-inner{padding:16px 18px}
+  .logo-text h1{font-size:34px}
+  .hero h2{font-size:30px}
+  .chips{gap:10px}
+  .rule-grid{grid-template-columns:1fr 1fr}
+  .result-years{font-size:46px}
+}
+@media (max-width:560px){
+  .header-inner{flex-wrap:wrap;row-gap:8px}
+  .logo-text h1{font-size:26px}
+  .logo-text p{display:none}
+  .lang-switch{margin-left:auto}
+  .meta-chip{order:3;margin-left:0;width:100%;white-space:normal;font-size:10.5px}
+  .step-head{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap header-inner">
+    <svg class="logo-ring" viewBox="0 0 32 32" aria-hidden="true">
+      <circle cx="16" cy="16" r="10" fill="none" stroke="#E03A2F" stroke-width="4.5"/>
+      <circle cx="16" cy="16" r="3" fill="#E03A2F"/>
+    </svg>
+    <div class="logo-text">
+      <h1 data-i18n="TITLE">rOtring Tikky 交叉断代</h1>
+      <p data-i18n="SUBTITLE">按型号、配色、刻印、帽顶等特征，交叉核对生产年代与真伪</p>
+    </div>
+    <div class="lang-switch" id="lang-switch" role="group" aria-label="Language">
+      <button class="lang-btn" type="button" data-lang="zh" aria-pressed="true">中文</button>
+      <button class="lang-btn" type="button" data-lang="en" aria-pressed="false">EN</button>
+      <button class="lang-btn" type="button" data-lang="ja" aria-pressed="false">日本語</button>
+    </div>
+    <span class="meta-chip" id="meta-chip">v1.3 · by STH · alxdshen@qq.com</span>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <h2 data-i18n="HERO_TITLE">逐项选择特征，交叉核对年代、型号与真伪</h2>
+    <p data-i18n="HERO_P">页面数据全部来自可追溯来源：rOtring 官方品牌史、Knockology 收藏论坛多帖（主帖、automatics 年表帖、目录帖、short history 帖等，转述 rOtring Museum 管理员 Dux 口述与目录实物）、「文具病」与 bungu-talk 目录、1996 年官方目录。不同来源口径不一致时，页面并列展示「口径分歧」；没有任何年代记载的组合，会标注「暂无可靠资料」，不猜测。</p>
+  </section>
+
+  <!-- ===== 选择区 ===== -->
+  <section class="selector" id="selector" aria-label="特征选择">
+    <div class="step" id="step-model">
+      <div class="step-head">
+        <span class="step-no">01</span>
+        <span class="step-title" data-i18n="S_MODEL">型号</span>
+        <span class="step-sub" data-i18n="S_MODEL_SUB">先定型号，这是最优先的依据；页面聚焦第一代（1979–1998 世代）</span>
+      </div>
+      <div class="chips" id="chips-model"></div>
+      <button class="chip-toggle" id="model-toggle" type="button" aria-expanded="false">
+        <span class="chip-toggle-label" data-i18n="TOGGLE_OPEN">展开全部型号（原型期 / GT / S / Standard / 400 / Esprit / 二代 / 三代 / 其他少见款）</span>
+        <span class="chip-toggle-arrow">▾</span>
+      </button>
+      <div class="chips rare hidden" id="chips-model-rare"></div>
+    </div>
+
+    <div class="step" id="step-color">
+      <div class="step-head">
+        <span class="step-no">02</span>
+        <span class="step-title" data-i18n="S_COLOR">笔杆颜色</span>
+        <span class="step-sub" data-i18n="S_COLOR_SUB">纯色不单独决定年代（含标志性酒红 Burgundy）；透明仅 Tikky II 可选；大理石配色有专属备注</span>
+      </div>
+      <div class="chips" id="chips-color"></div>
+    </div>
+
+    <div class="step" id="step-barrel">
+      <div class="step-head">
+        <span class="step-no">03</span>
+        <span class="step-title" data-i18n="S_BARREL">笔杆刻印</span>
+        <span class="step-sub" data-i18n="S_BARREL_SUB">可多选；笔杆印刷通常不含产地字样，产地信息在笔夹</span>
+      </div>
+      <div class="chips" id="chips-barrel"></div>
+    </div>
+
+    <div class="step" id="step-clip">
+      <div class="step-head">
+        <span class="step-no">04</span>
+        <span class="step-title" data-i18n="S_CLIP">笔夹刻印</span>
+        <span class="step-sub" data-i18n="S_CLIP_SUB">可多选；同一支笔通常只有一个刻字，多选用于不确定时对照。年代随结果区上方的口径切换</span>
+      </div>
+      <div class="chips" id="chips-clip"></div>
+    </div>
+
+    <div class="step" id="step-ring">
+      <div class="step-head">
+        <span class="step-no">05</span>
+        <span class="step-title" data-i18n="S_RING">杆身环（进阶）</span>
+        <span class="step-sub" data-i18n="S_RING_SUB">笔杆中段色环，可选可不选；仅少数型号有环的年份记载</span>
+      </div>
+      <div class="chips" id="chips-ring"></div>
+    </div>
+
+    <div class="step" id="step-marking">
+      <div class="step-head">
+        <span class="step-no">06</span>
+        <span class="step-title" data-i18n="S_MARKING">笔径（芯径）</span>
+        <span class="step-sub" data-i18n="S_MARKING_SUB">杆上印的具体毫米数——被低估的硬年代指标：0.3/0.9 是第一代，0.35/1.0 是 1996 年后</span>
+      </div>
+      <div class="chips" id="chips-marking"></div>
+    </div>
+
+    <div class="step" id="step-sleeve">
+      <div class="step-head">
+        <span class="step-no">07</span>
+        <span class="step-title" data-i18n="S_SLEEVE">护芯管类型（进阶）</span>
+        <span class="step-sub" data-i18n="S_SLEEVE_SUB">固定 / 半滑动 / 全滑动 / 双敲 / 锥形——这是识别「型号是不是认错了」的硬证据</span>
+      </div>
+      <div class="chips" id="chips-sleeve"></div>
+    </div>
+
+    <div class="step" id="step-cap">
+      <div class="step-head">
+        <span class="step-no">08</span>
+        <span class="step-title" data-i18n="S_CAP">帽顶形状（观察 + 文字证据）</span>
+        <span class="step-sub" data-i18n="S_CAP_SUB">金属圆头 / 金属平头 / 金属头带塑料圆顶 / 金属头镂空——塑料圆顶有日文记载，圆头有藏家描述，其余为收藏圈观察</span>
+      </div>
+      <div class="chips" id="chips-cap"></div>
+    </div>
+
+    <button class="reset" id="btn-reset" type="button" data-i18n="RESET">重置全部选择</button>
+  </section>
+
+  <!-- ===== 结果 ===== -->
+  <section class="result" id="result" aria-live="polite">
+    <div class="result-pad" id="result-body">
+      <div class="result-empty" data-i18n="EMPTY">先选择型号，页面会即时给出生产年代区间。</div>
+    </div>
+  </section>
+
+  <!-- ===== 笔夹刻字对照 ===== -->
+  <section class="section">
+    <h3 class="section-title" data-i18n="CLIP_TABLE_T">笔夹刻字对照表</h3>
+    <p class="section-sub" data-i18n="CLIP_TABLE_S">笔夹刻字有<b>三套并存口径</b>，差异很大（W. Germany 的结束年从 1990 到 1995 相差五年）。下表随上方切换实时变化；三套口径的共识只有两点：W. Germany ⇒ 1995 年之前，Germany ⇒ 1990 年之后。</p>
+    <div class="theory-bar" id="theory-bar"></div>
+    <div class="rule-grid" id="rule-grid"></div>
+    <p class="section-sub" id="theory-note" style="margin:12px 0 0" data-i18n="THEORY_NOTE_STATIC">口径说明加载中…</p>
+    <p class="section-sub" style="margin:8px 0 0" data-i18n="THEORY_SRC">口径来源：<b>B</b> = Knockology 主帖转述 rOtring Museum（Dux）工程师口述 + 作者实物核对，作者称「可能更接近现实」；<b>A</b> = 行业普遍规律（1990 两德统一后切换）；<b>C</b> = 日本收藏博客（2009 年实测，W.Germany ⇒ 1990 年 10 月以前）。三套口径的共识只有两点：W. Germany ⇒ 1995 年之前，Germany ⇒ 1990 年之后。</p>
+  </section>
+
+  <!-- ===== 芯径与笔尖参考 ===== -->
+  <section class="section">
+    <h3 class="section-title" data-i18n="REF_T">笔尖横纹 / 内部塑料色 / 印字颜色 对照</h3>
+    <p class="section-sub" data-i18n="REF_S">不用拆笔，靠笔尖横纹就能读出真实笔径；内部塑料色要拆开才看得到。来源：rOtring Museum 大理石条目与 1989 白色套装、文具病 079。</p>
+    <table class="ref-table">
+      <thead><tr><th data-i18n="TH_SIZE">笔径</th><th data-i18n="TH_RIDGES">笔尖横纹数</th><th data-i18n="TH_PLASTIC">内部塑料色</th><th data-i18n="TH_INK">早期印字颜色</th><th data-i18n="TH_ANCHOR">年代锚点</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">0.3 / 0.35</td><td class="mono">1 条</td><td data-i18n="RED">红</td><td data-i18n="Y_0_3">0.3 为黄字（文具病单源）</td><td data-i18n="A_0_3">0.3=1996 前；0.35=1996 后</td></tr>
+        <tr><td class="mono">0.5</td><td class="mono" data-i18n="NO_RIDGE">无横纹</td><td data-i18n="BLACK">黑</td><td data-i18n="NR">未记载</td><td data-i18n="ALL_SERIES">贯穿全系</td></tr>
+        <tr><td class="mono">0.7</td><td class="mono">2 条</td><td data-i18n="BLUE">蓝</td><td data-i18n="NR">未记载</td><td data-i18n="ALL_SERIES">贯穿全系</td></tr>
+        <tr><td class="mono">0.9 / 1.0</td><td class="mono">3 条</td><td data-i18n="TRANSPARENT">透明</td><td data-i18n="O_0_9">0.9 为橙字（文具病单源）</td><td data-i18n="A_0_9">0.9=仅第一代（早期德系标）；1.0=1996 白色套装起（一代大理石亦有 1.0）</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ===== 说明 ===== -->
+  <section class="section">
+    <h3 class="section-title" data-i18n="NOTES_T">说明与边界</h3>
+    <div class="notes-box">
+      <ul id="notes-list"></ul>
+    </div>
+  </section>
+
+  <!-- ===== 来源 ===== -->
+  <section class="section sources">
+    <h3 data-i18n="SRC_T">参考来源</h3>
+    <ul class="src-list" id="src-list"></ul>
+    <p class="src-note" id="src-note"></p>
+    <p class="src-relation" data-i18n="SRC_REL">注意：K1（Knockology 主帖）与 V1（YouTube 视频）出自同一作者——论坛用户 Pdunc67（即频道主 Patrick，Great Mechanical Pencils）。K1 是帖子形式、主要转述 rOtring Museum 管理员 Dux 提供的工程师口述；V1 是视频形式、是该作者本人作为收藏家的口径。两处言论同源同人，页面仍并列展示，便于你对照其帖子与视频表述是否一致。此外页面还并入了与 Patrick 无直接关联的独立来源：Heath 整理的《rOtring automatics》年表帖（K10，引用 rOtring Museum 档案与美/瑞目录）、rOtring Museum 管理员 Dux 本人对 GT 与 aqua green 交叉点的确认（K9、K1 第 2 页）等，构成多口径对照。</p>
+  </section>
+
+</main>
+
+<footer data-i18n="FOOTER">
+  红环 Tikky 交叉断代 · 数据为收藏圈整理口径 · 仅供爱好者参考
+</footer>
+
+<script>
+/* ================= 语言 ================= */
+var LANG = "zh";   // zh | en | ja
+function T(zh, en, ja){ return LANG==="en" ? (en!==undefined?en:zh) : (LANG==="ja" ? (ja!==undefined?ja:zh) : zh); }
+function TX(obj){   // obj 可能带 _en/_ja 覆盖字段（如 {zh:"…",_en:"…",_ja:"…"} 或 {name:"…",name_en:"…",name_ja:"…"}）
+  if(!obj) return "";
+  if(typeof obj==="string") return obj;
+  if(LANG==="en" && obj._en!==undefined) return obj._en;
+  if(LANG==="ja" && obj._ja!==undefined) return obj._ja;
+  return obj.zh!==undefined ? obj.zh : String(obj);
+}
+function langField(base, field){ // base={name:"中文",name_en:"EN",name_ja:"JA"} → 取当前语言
+  if(!base) return "";
+  var k = LANG==="en" ? field+"_en" : (LANG==="ja" ? field+"_ja" : field);
+  var v = base[k];
+  if(v!==undefined) return v;
+  return base[field]!==undefined ? base[field] : "";
+}
+function UI_T(k){ return T(UI[k], UI[k+"_en"], UI[k+"_ja"]); }
+function applyLang(){
+  document.querySelectorAll("[data-i18n]").forEach(function(el){
+    var k=el.getAttribute("data-i18n");
+    var v=UI[k];
+    if(v!==undefined && el.tagName!=="INPUT"){
+      var txt=(typeof v==="object"?TX(v):T(UI[k],UI[k+"_en"],UI[k+"_ja"]));
+      if(k==="CLIP_TABLE_S" || k==="THEORY_SRC"){ el.innerHTML=txt; }
+      else{ el.textContent=txt; }
+    }
+  });
+  buildChipsAll(); buildTheoryBar(); buildRules(); buildSources(); buildNotes(); renderResult();
+  syncChips();
+  var btns=document.querySelectorAll(".lang-btn");
+  btns.forEach(function(b){ b.setAttribute("aria-pressed", b.getAttribute("data-lang")===LANG?"true":"false"); });
+}
+(function(){
+  var sw=document.getElementById("lang-switch");
+  if(sw){
+    sw.addEventListener("click",function(e){
+      var b=e.target.closest(".lang-btn");
+      if(!b) return;
+      LANG=b.getAttribute("data-lang");
+      applyLang();
+    });
+  }
+})();
+
+/* ================= 数据（全部来自已核实来源） ================= */
+var SOURCES = [
+  {key:"O1", label:"rOtring 官方品牌史（德国站）", label_en:"rOtring official brand history (Germany)", label_ja:"rOtring 公式ブランド史（ドイツ）", url:"https://www.rotring.de/heritage.html"},
+  {key:"O2", label:"rOtring 官方品牌史（英国站）", label_en:"rOtring official brand history (UK)", label_ja:"rOtring 公式ブランド史（英国）", url:"https://www.rotring.co.uk/heritage.html"},
+  {key:"K1", label:"Knockology《The rOtring Tikky》主帖", label_en:"Knockology \"The rOtring Tikky\" main thread", label_ja:"Knockology「The rOtring Tikky」メインスレッド", url:"https://forum.knockology.com/t/the-rotring-tikky/2048"},
+  {key:"K5", label:"Knockology《The rOtring Tikky》第 5 页", label_en:"Knockology \"The rOtring Tikky\" p.5", label_ja:"Knockology「The rOtring Tikky」5 ページ目", url:"https://forum.knockology.com/t/the-rotring-tikky/2048?page=5"},
+  {key:"K4", label:"Knockology《The rOtring Tikky》第 4 页（logo 1993 更换口径）", label_en:"Knockology \"The rOtring Tikky\" p.4 (logo change 1993)", label_ja:"Knockology「The rOtring Tikky」4 ページ目（ロゴ 1993 変更口径）", url:"https://forum.knockology.com/t/the-rotring-tikky/2048?page=4"},
+  {key:"M1", label:"rOtring Museum（历史与目录）", label_en:"rOtring Museum (history & catalogs)", label_ja:"rOtring Museum（歴史とカタログ）", url:"https://rotringmuseum.com/"},
+  {key:"B1", label:"ブングトーク备忘录：Tikky 谱系与日本限定信息（2017）", label_en:"bungu-talk memo: Tikky lineage & Japan-limited info (2017)", label_ja:"ブングトーク備忘録：Tikky 系譜と日本限定情報（2017）", url:"https://bungu-talk.jp/archives/tikky.html"},
+  {key:"S1", label:"文具病 051：初代 Tikky Special 早期版（图示口径 1984–1988、笔夹印 W. Germany）", label_en:"Stationeria 051: early 1st-gen Tikky Special (chart 1984–1988, W. Germany clip)", label_ja:"文具病 051：初代 Tikky Special 初期版（図解口径 1984–1988、クリップ W. Germany）", url:"http://www.stationeria.net/2010/07/051tikky-special.html"},
+  {key:"R1", label:"Rotring Tikky Series（韩国收藏博客，2009）", label_en:"Rotring Tikky Series (Korean collector blog, 2009)", label_ja:"Rotring Tikky Series（韓国コレクターブログ、2009）", url:"https://ralrara.tistory.com/m/36"},
+  {key:"P1", label:"rOtring 1996 官方目录 PDF", label_en:"rOtring 1996 official catalog PDF", label_ja:"rOtring 1996 年公式カタログ PDF", url:"https://rotringsrbija.rs/wp-content/uploads/2022/06/1996.pdf"},
+  {key:"F1", label:"Fountain Pen Network：笔夹 W. Germany/Germany 刻字切换讨论", label_en:"Fountain Pen Network: W. Germany/Germany clip imprint switch", label_ja:"Fountain Pen Network：クリップ W. Germany/Germany 刻印切替の議論", url:"https://www.fountainpennetwork.com/forum/topic/348258-w-germany-on-clip-band/"},
+  {key:"K2", label:"Knockology《Tikky Metallic Double Push question》（环色年份）", label_en:"Knockology \"Tikky Metallic Double Push question\" (ring-color dating)", label_ja:"Knockology「Tikky Metallic Double Push question」（リング色の年代）", url:"https://forum.knockology.com/t/tikky-metallic-double-push-question/147"},
+  {key:"K3", label:"Knockology《Reference: rOtring automatics》（红环位置）", label_en:"Knockology \"Reference: rOtring automatics\" (red-ring placement)", label_ja:"Knockology「Reference: rOtring automatics」（赤リング位置）", url:"https://forum.knockology.com/t/reference-rotring-automatics-draft/1075/4"},
+  {key:"K6", label:"Knockology《rOtring Tikky Timeline》v12（时间轴图：型号区间 + 刻字 A/B 双口径）", label_en:"Knockology \"rOtring Tikky Timeline\" v12 (timeline chart: model ranges + A/B theories)", label_ja:"Knockology「rOtring Tikky Timeline」v12（タイムライン図：モデル区間＋刻印 A/B 二口径）", url:"https://forum.knockology.com/t/rotring-tikky-timeline/2678"},
+  {key:"K7", label:"Knockology《The rOtring Tikky》第 4 页（logo 1993 更换、SC 1999、Tikky metallic S）", label_en:"Knockology \"The rOtring Tikky\" p.4 (logo 1993, SC 1999, Tikky metallic S)", label_ja:"Knockology「The rOtring Tikky」4 ページ目（ロゴ 1993、SC 1999、Tikky metallic S）", url:"https://forum.knockology.com/t/the-rotring-tikky/2048?page=4"},
+  {key:"K8", label:"Knockology《How much would my old Rotring Tikky be worth?》（R502155 全金属 S Metallic 实物：笔身无字、笔夹仅压印 rOtring 圆标）", label_en:"Knockology \"How much would my old Rotring Tikky be worth?\" (R502155 all-metal S Metallic: unmarked body, embossed rOtring logo clip)", label_ja:"Knockology「How much would my old Rotring Tikky be worth?」（R502155 オール金属 S Metallic 実物：ボディ無表記、クリップは rOtring 丸ロゴのエンボスのみ）", url:"https://forum.knockology.com/t/how-much-would-my-old-rotring-tikky-be-worth/4816/1"},
+  {key:"K9", label:"Knockology《Link to rOtring Catalogs》（1984 年目录 p.20「Tikky Metallic」Art. 502 175，Dux 确认为 rOtring GT——proto-Tikky：S、F、GT 之一，早于 Tikky 命名）", label_en:"Knockology \"Link to rOtring Catalogs\" (1984 catalog p.20 \"Tikky Metallic\" Art. 502 175, Dux confirms rOtring GT — one of proto-Tikky: S, F, GT, predating the Tikky name)", label_ja:"Knockology「Link to rOtring Catalogs」（1984 年カタログ p.20「Tikky Metallic」Art. 502 175、Dux が rOtring GT と確認——proto-Tikky：S、F、GT の一つで Tikky 命名より前）", url:"https://forum.knockology.com/t/link-to-rotring-catalogs-1980-90-96-98-99-00-01-02-04-05-06-07-08-09-10-11-12-13-14-15-16-2017/1964"},
+  {key:"K10", label:"Knockology《Reference: rOtring automatics》全文（Tikky Automatic/LS 德国 1987 首发、1988 美/瑞目录才标 NEW；LS 首版银杆+红 rOtring logo、1990 改红环+银字 automatic LS；1992 转入 Rotring 400 502 191；1994 印字更新；LS 用 Uni A-Tech 同款机构、400 用 Kotobuki 机构）", label_en:"Knockology \"Reference: rOtring automatics\" full text (Tikky Automatic/LS German debut 1987, NEW only in 1988 US/SW catalogs; LS 1st ver. silver + red rOtring logo, 1990 red ring + silver automatic LS; 1992 → Rotring 400 502 191; 1994 imprint update; LS = Uni A-Tech mechanism, 400 = Kotobuki)", label_ja:"Knockology「Reference: rOtring automatics」全文（Tikky Automatic/LS ドイツ 1987 初出、1988 年米・スウェーデン目録のみ NEW；LS 初版シルバー＋赤 rOtring ロゴ、1990 赤リング＋シルバー automatic LS；1992 に Rotring 400 502 191 へ；1994 印字更新；LS は Uni A-Tech 同型機構、400 は Kotobuki 機構）", url:"https://forum.knockology.com/t/reference-rotring-automatics-draft/1075"},
+  {key:"K11", label:"Knockology《Rotring Tikky a short history》（Tikky 命名考源：Tintenkuli→Tiku→Bleikuli/Rollkuli→Tikky；2008 品牌短暂变 Papermate Tikky by rOtring 仅一年）", label_en:"Knockology \"Rotring Tikky a short history\" (naming: Tintenkuli→Tiku→Bleikuli/Rollkuli→Tikky; 2008 briefly Papermate Tikky by rOtring for one year)", label_ja:"Knockology「Rotring Tikky a short history」（命名考源：Tintenkuli→Tiku→Bleikuli/Rollkuli→Tikky；2008 年ブランドが一時 Papermate Tikky by rOtring に、わずか一年）", url:"https://forum.knockology.com/t/rotring-tikky-a-short-history/676"},
+  {key:"K12", label:"Knockology《K.I.T.T. vs Tikky》（塑料 Double Push 0.5 实物：全塑料外壳）", label_en:"Knockology \"K.I.T.T. vs Tikky\" (plastic Double Push 0.5: all-plastic shell)", label_ja:"Knockology「K.I.T.T. vs Tikky」（プラ Double Push 0.5 実物：全面プラシェル）", url:"https://forum.knockology.com/t/k-i-t-t-vs-tikky/4035"},
+  {key:"K13", label:"Knockology《Group purchase offer for Rotring TIKKY 3-in-1》（3-in-1：2 圆珠笔+1 自动铅笔、重力切换机构、软胶按扣）", label_en:"Knockology \"Group purchase offer for Rotring TIKKY 3-in-1\" (3-in-1: 2 ballpoints + 1 mechanical pencil, gravity switch, soft button)", label_ja:"Knockology「Group purchase offer for Rotring TIKKY 3-in-1」（3-in-1：ボールペン 2＋シャープペン 1、重力切替、ソフトボタン）", url:"https://forum.knockology.com/t/group-purchase-offer-for-rotring-tikky-3-in-1/3698"},
+  {key:"N1", label:"はぴすて 2009：Tikky Special（W.Germany ⇒ 1990 年 10 月以前实测口径）", label_en:"Hapistationery 2009: Tikky Special (W.Germany ⇒ tested before Oct 1990)", label_ja:"はぴすて 2009：Tikky Special（W.Germany ⇒ 1990 年 10 月以前の実測口径）", url:"http://happystationery.cocolog-nifty.com/blog/2009/06/post-ca6e.html"},
+  {key:"N2", label:"文具病 079：似 Tikky、非 Tikky（含关键留言：0.3/0.9 ↔ 0.35/1.0 标示切换、笔尖横纹与芯槽颜色）", label_en:"Stationeria 079: looks-like-Tikky vs not (key comments: 0.3/0.9 ↔ 0.35/1.0 switch, tip ridges & feed colors)", label_ja:"文具病 079：Tikky もどき／非 Tikky（重要コメント：0.3/0.9 ↔ 0.35/1.0 表記切替、ペン先横線と芯溝色）", url:"http://www.stationeria.net/2010/12/079tikkytikky.html"},
+  {key:"N3", label:"文具病 055 / 059：大理石、木屑、灰色亮片款（1990's、花体与粗体之分）", label_en:"Stationeria 055/059: marble, woodchip, grey glitter (1990s, script vs bold)", label_ja:"文具病 055 / 059：マーブル、木屑、グレーラメ（1990年代、筆記体と太字）", url:"http://www.stationeria.net/2010/08/055tikky-special.html"},
+  {key:"N4", label:"钢笔论坛《元祖rOtring T與rOtring T1》（rOtring 货号分段：T=502 06X / Tikky=502 10X / TS=502 20X）", label_en:"PenBBS \"rOtring T and rOtring T1\" (rOtring article-number blocks: T=502 06X / Tikky=502 10X / TS=502 20X)", label_ja:"PenBBS「元祖rOtring TとrOtring T1」（rOtring 品番区分：T=502 06X / Tikky=502 10X / TS=502 20X）", url:"https://www.penbbs.com/forum.php?mod=viewthread&tid=207407"},
+  {key:"N5", label:"韩国 namu wiki《로트링》：Tikky 各代辨别规则（子代号/条码）", label_en:"Korean namu wiki \"로트링\": Tikky generation identification rules (sub-code/barcode)", label_ja:"韓国 namu wiki「로트링」：Tikky 各世代の識別ルール（サブコード/バーコード）", url:"https://m.namu.moe/w/%EB%A1%9C%ED%8A%B8%EB%A7%81"},
+  {key:"M2", label:"rOtring Museum 单品：Tikky Special 首代（Rotring + W.Germany、无红环；1989 后改 Germany）", label_en:"rOtring Museum item: 1st-gen Tikky Special (Rotring + W.Germany, no red ring; Germany after 1989)", label_ja:"rOtring Museum 個品：初代 Tikky Special（Rotring＋W.Germany、赤リングなし；1989 以降 Germany）", url:"https://rotringmuseum.com/rotring_item.php?id=91"},
+  {key:"M3", label:"rOtring Museum 单品：1989 白色三硬度套（环按芯径分色：0.3 黄 / 0.5 棕 / 0.7 蓝，仍 W.Germany）", label_en:"rOtring Museum item: 1989 white 3-hardness set (rings by lead size: 0.3 yellow / 0.5 brown / 0.7 blue, still W.Germany)", label_ja:"rOtring Museum 個品：1989 年ホワイト 3 硬度セット（リング芯径別：0.3 黄 / 0.5 茶 / 0.7 青、なお W.Germany）", url:"https://rotringmuseum.com/rotring_item.php?id=179"},
+  {key:"M4", label:"rOtring Museum 单品：1996 白色套装（全红环 + 帽顶彩片 + 0.35 + Germany + 字体已换）", label_en:"rOtring Museum item: 1996 white set (full red rings + colored cap pieces + 0.35 + Germany + new lettering)", label_ja:"rOtring Museum 個品：1996 年ホワイトセット（全面赤リング＋キャップ彩片＋0.35＋Germany＋書体変更済み）", url:"https://rotringmuseum.com/rotring_item.php?id=183"},
+  {key:"M5", label:"rOtring Museum 单品：Tikky metallic Double Push（1985 银环红字 → 1987 各色银环 → 1990 红环）", label_en:"rOtring Museum item: Tikky metallic Double Push (1985 silver ring + red text → 1987 colored silver rings → 1990 red ring)", label_ja:"rOtring Museum 個品：Tikky metallic Double Push（1985 銀リング赤文字 → 1987 各色銀リング → 1990 赤リング）", url:"https://rotringmuseum.com/rotring_item.php?id=350"},
+  {key:"N6", label:"ブングトーク备忘录：Tikky 谱系（护芯管全长：固定 4 / 半滑动 3.5–5 / 全滑动 0–3；白杆三硬度套红环）", label_en:"bungu-talk memo: Tikky lineage (sleeve travel: fixed 4 / half-slide 3.5–5 / full-slide 0–3; white 3-set red ring)", label_ja:"ブングトーク備忘録：Tikky 系譜（パイプ可動域：固定 4 / 半スライド 3.5–5 / 全スライド 0–3；白軸 3 硬度セット赤リング）", url:"https://bungu-talk.jp/archives/tikky.html"},
+  {key:"V1", label:"Great Mechanical Pencils（YouTube 原视频）：《Exploring the rOtring Tikky: Full History & All Models (1979-Now)》（1987 年 T 切固定管、老杆型卖至 1998 年；含 GT v1/v2、Rotring 400、Esprit 年代；S/S Metallic/Automatic 另有口径）", label_en:"Great Mechanical Pencils (original YouTube video): \"Exploring the rOtring Tikky: Full History & All Models (1979-Now)\" (T switched to fixed sleeve 1987, old body sold to 1998; GT v1/v2, Rotring 400, Esprit years; separate dates for S/S Metallic/Automatic)", label_ja:"Great Mechanical Pencils（YouTube 原動画）：「Exploring the rOtring Tikky: Full History & All Models (1979-Now)」（1987 年 T が固定管へ切替、旧ボディは 1998 年まで販売；GT v1/v2、Rotring 400、Esprit 年代；S/S Metallic/Automatic は別口径）", url:"https://www.youtube.com/watch?v=VblKtk8k9uE"}
+];
+
+var MODELS = [
+  {id:"proto", name:"rOtring F（原型期）", name_en:"rOtring F (proto era)", name_ja:"rOtring F（プロト期）", lo:1978, hi:1983, years:"1978/79 – 1983", src:"M2;N6", noMarble:true,
+   note:"此时「Tikky」这个名字还没启用：笔夹只有旧 rOtring logo，笔杆上没有 Tikky 字样，固定 4mm 护芯管。若一支笔杆上没有 Tikky 字样、笔夹只有 rotring logo，它属于原型期而不是 Special [M2][N6]。同期的金属杆 GT 已单列（1979–1986）。",
+   note_en:"The name \"Tikky\" was not yet used: the clip carries only the old rOtring logo, the barrel has no \"Tikky\" text, and the lead sleeve is a fixed 4 mm. If a pen has no Tikky text on the barrel and only the rOtring logo on the clip, it belongs to the proto era, not Special [M2][N6]. The metal-bodied GT of the same period is listed separately (1979–1986).",
+   note_ja:"この時期はまだ「Tikky」の名が使われていなかった。クリップは旧 rOtring ロゴのみ、軸に Tikky 表記なし、パイプは固定 4mm。軸に Tikky 表記がなくクリップに rOtring ロゴだけの場合は、Special ではなくプロト期に属する [M2][N6]。同時期の金属軸 GT は別項目（1979–1986）。"},
+  {id:"gt", name:"rOtring GT（原型期金属款）", name_en:"rOtring GT (proto metal)", name_ja:"rOtring GT（プロト期金属）", lo:1979, hi:1986, years:"V1 1979–1982 / V2 1983–1986", src:"V1; K9", noMarble:true, sleeveUnknown:true,
+   variants:[
+     {label:"GT V1（视频口径）", label_en:"GT V1 (video)", label_ja:"GT V1（動画口径）", lo:1979, hi:1982, src:"V1"},
+     {label:"GT V2（视频口径）", label_en:"GT V2 (video)", label_ja:"GT V2（動画口径）", lo:1983, hi:1986, src:"V1"}
+   ],
+   note:"全金属杆、棕色塑料波浪握胶。V1（1979–1982）：笔杆无文字、绿橡皮、旧 rOtring logo 笔夹；V2（1983–1986）：笔杆红字 rOtring、新字体、白橡皮、塑料引芯管、黄铜卡头 [V1]。V1/V2 划分与区间为 Mechanical Pencils 视频单源，页面标注为参考口径；护芯管类型视频称无可靠记载。**官方目录佐证（独立来源）：1984 年 rOtring 目录 p.20 的「Tikky Metallic」= Art. 502 175（金属杆+棕色塑料握把+4mm 固定管+0.5mm HB），rOtring Museum Dux 确认为 rOtring GT——proto-Tikky（S、F、GT）之一，早于 Tikky 命名 [K9]。**按此目录口径，GT 护芯管为 4mm 固定管（与视频「无记载」并列，两口径并存）；若无把握仍可选「不确定」。",
+   note_en:"Full-metal barrel with brown plastic wave grip. V1 (1979–1982): no barrel text, green eraser, old rOtring logo clip. V2 (1983–1986): red \"rOtring\" barrel text, new lettering, white eraser, plastic lead tube, brass chuck [V1]. The V1/V2 split and ranges come only from the Mechanical Pencils video (reference only); the video reports no reliable sleeve data. **Official catalog corroboration (independent): the 1984 rOtring catalog p.20 lists \"Tikky Metallic\" = Art. 502 175 (metal barrel + brown plastic grip + 4 mm fixed sleeve + 0.5 mm HB), confirmed by rOtring Museum curator Dux as the rOtring GT — one of the proto-Tikky (S, F, GT), predating the Tikky name [K9].** By that catalog, the GT sleeve is a 4 mm fixed sleeve (shown alongside the video's \"no data\").",
+   note_ja:"全金属軸・茶色プラスチック波型グリップ。V1（1979–1982）：軸無表記、緑消しゴム、旧 rOtring ロゴクリップ。V2（1983–1986）：軸に赤字 rOtring、新書体、白消しゴム、プラスチック芯管、真鍮チャック [V1]。V1/V2 区分と期間は Mechanical Pencils 動画のみの単源（参考口径）。動画はパイプの信頼できる記録なしとしている。**公式カタログ裏付け（独立出典）：1984 年 rOtring カタログ p.20 の「Tikky Metallic」＝ Art. 502 175（金属軸＋茶プラ握り＋4mm 固定管＋0.5mm HB）で、rOtring Museum 管理人 Dux が rOtring GT と確認——proto-Tikky（S、F、GT）の一つで Tikky 命名より前 [K9]。**このカタログ口径では GT のパイプは 4mm 固定管（動画の「記録なし」と並列表示）。"},
+  {id:"tikky_f", name:"Tikky F", name_en:"Tikky F", name_ja:"Tikky F", lo:1979, hi:1983, years:"1979 – 1983", src:"K1; B1", noMarble:true,
+   note:"固定护管，笔杆为花体（草书）Tikky 字样，后演变为 Special。日文博客：原为 Rotring F（1980 年起售），后更名 Tikky F；Tikky 字样为「踊るような」（跳舞般的）花体；金属内筒。视频口径：4mm 固定管、0.5mm、绿橡皮、黄铜卡头、清芯杆 [V1]。",
+   note_en:"Fixed sleeve, script (cursive) \"Tikky\" barrel text; it later evolved into the Special. Japanese blog: originally sold as Rotring F (from 1980), later renamed Tikky F; the Tikky text is a dancing-style script; metal inner barrel. Video: 4 mm fixed sleeve, 0.5 mm, green eraser, brass chuck, cleaning rod [V1].",
+   note_ja:"固定パイプ、軸に筆記体（踊るような）の Tikky 表記。後に Special へ発展。日本のブログ：当初は Rotring F（1980 年発売）として販売、後に Tikky F へ改名。Tikky 表記は「踊るような」筆記体。金属内筒。動画口径：4mm 固定管、0.5mm、緑消しゴム、真鍮チャック、芯クリーナー [V1]。"},
+  {id:"rt", name:"rOtring T", name_en:"rOtring T", name_ja:"rOtring T", lo:1979, hi:1998, years:"1979 – 1998（早期杆型）", years_en:"1979 – 1998 (early body)", years_ja:"1979 – 1998（初期ボディ）", src:"K1; B1; K5", noMarble:true,
+   note:"早期杆型 1979–1998（Mechanical Pencils 视频口径：T 老杆型卖到 1998 年才改新杆型，没有在 1980 年代停产）。实物佐证：藏家 International_Orange 称其 1982 年 8 月（伦敦《ET》首映次日）就已持有同款，内部黄色塑料笔杆、持芯组件灰色塑料、红环上方有凸起 rOtring 字样——佐证早期杆型在 1980 年代初即已流通 [K5]。护芯管切换点有两套口径：① 日文 bungu-talk：约 1984 年起改为固定 4mm 管与金属顶帽（1980 年代初版为小豆色轴、3.5–5mm 半滑动管、帽顶带圆树脂件）；② Mechanical Pencils 视频 / Knockology 时间轴：1987 年才切固定管，半滑动管 T = 1979–1987。两套口径并存，切换点相差约 3 年，页面按视频口径参与交叉计算并在备注中并列展示。Knockology 另列 1998–2008 后期杆型（与 Tikky II 同杆型）；西德标、W. Germany 笔夹的老 T 只可能是早期杆型。跨度较长，请配合笔夹刻印与护芯管类型收窄范围。",
+   note_en:"Early body 1979–1998 (Mechanical Pencils video: the old T body sold until 1998, not discontinued in the 1980s). Physical evidence: collector International_Orange says he owned the same pen since August 1982 (the day after the London premiere of E.T.), with yellow inner plastic barrel, grey plastic chuck assembly, and raised \"rOtring\" text above the red ring — confirming the early body circulated in the early 1980s [K5]. Two theories on the sleeve switch: ① bungu-talk (Japanese): fixed 4 mm sleeve and metal cap top from c. 1984 (the early 1980s first version had a bean-red barrel, 3.5–5 mm half-slide sleeve, and a round resin cap top); ② Mechanical Pencils video / Knockology timeline: fixed sleeve from 1987, half-slide T = 1979–1987. Both are shown; the page uses the video theory for cross-calculation. Knockology also lists a 1998–2008 late body (shared with Tikky II).",
+   note_ja:"初期ボディ 1979–1998（Mechanical Pencils 動画口径：T の旧ボディは 1998 年まで販売、1980 年代に終売ではない）。実物裏付け：コレクター International_Orange は 1982 年 8 月（ロンドン『ET』初日の翌日）に同型を入手済みと述べる。内部黄色プラ軸、チャック部グレー、赤リング上に浮き出しの rOtring 表記——初期ボディが 1980 年代初頭に流通していた証拠 [K5]。パイプ切替には二口径：① bungu-talk（日本語）：約 1984 年から固定 4mm 管＋金属トップ（1980 年代初期版は小豆色軸、3.5–5mm 半スライド管、キャップ先端に丸い樹脂部品）；② Mechanical Pencils 動画／Knockology タイムライン：1987 年から固定管、半スライド T＝1979–1987。二口径を並列表示、計算は動画口径で実施。Knockology は 1998–2008 の後期ボディ（Tikky II と同型）も記載。"},
+  {id:"s_plastic", name:"rOtring S（塑料）", name_en:"rOtring S (plastic)", name_ja:"rOtring S（プラスチック）", lo:1981, hi:1988, years:"约 1981 – 1988", years_en:"c. 1981 – 1988", years_ja:"約 1981 – 1988", src:"K6; V1", noMarble:true,
+   variants:[
+     {label:"Knockology 时间轴口径", label_en:"Knockology timeline", label_ja:"Knockology タイムライン口径", lo:1981, hi:1988, src:"K6"},
+     {label:"Mechanical Pencils 视频口径", label_en:"Mechanical Pencils video", label_ja:"Mechanical Pencils 動画口径", lo:1979, hi:1985, src:"V1"}
+   ],
+   note:"与 Tikky 同代的近亲，外形极像初代 Tikky；S = 全滑动护芯管（罕见，网图多为绿色）。区间目前只有时间轴图的概略标注，缺独立目录佐证，属推断。视频口径另记为 1979–1985（0.5mm、全滑动管、白色印字完整者极难找）[V1]。两种口径并存，页面并列展示。",
+   note_en:"A close sibling of the same era, almost identical in shape to the first-gen Tikky; S = full-slide sleeve (rare; online photos are mostly green). The range currently rests only on a rough timeline annotation with no independent catalog corroboration — inferred. The video gives 1979–1985 (0.5 mm, full-slide sleeve; intact white imprint is very hard to find) [V1]. Both theories are shown side by side.",
+   note_ja:"Tikky と同世代の近縁モデルで、初代 Tikky に酷似。S＝全スライドパイプ（希少、ネット上の写真はほぼ緑）。期間はタイムライン図の概略のみで、独立したカタログ裏付けがなく推測。動画口径では 1979–1985（0.5mm、全スライド管、白印字の完全な個体は極めて入手困難）[V1]。二口径を並列表示。"},
+  {id:"s_metal", name:"rOtring S Metallic", name_en:"rOtring S Metallic", name_ja:"rOtring S Metallic", lo:1983, hi:1988, years:"约 1983 – 1988", years_en:"c. 1983 – 1988", years_ja:"約 1983 – 1988", src:"K6; V1", noMarble:true,
+   variants:[
+     {label:"Knockology 时间轴口径", label_en:"Knockology timeline", label_ja:"Knockology タイムライン口径", lo:1983, hi:1988, src:"K6"},
+     {label:"Mechanical Pencils 视频口径", label_en:"Mechanical Pencils video", label_ja:"Mechanical Pencils 動画口径", lo:1979, hi:1990, src:"V1"}
+   ],
+   note:"金属版 S，时间轴图标注 1983–1988（概略，属推断）；金属款另有红环年代表（如 Metallic Double Push 1985 银环红字）。视频口径：1979–约1990 在售，滑动管，1979–1984 之间由光面金属握胶改为波浪纹握胶 [V1]。两种口径并存，页面并列展示。",
+   note_en:"Metal version of the S; the timeline marks 1983–1988 (rough, inferred). Metal models also have a red-ring year scheme (e.g. Metallic Double Push 1985 silver ring + red text). Video: on sale 1979–c.1990, sliding sleeve; the grip changed from smooth metal to a wave-ribbed grip between 1979 and 1984 [V1]. Both theories are shown side by side.",
+   note_ja:"金属版 S。タイムライン図では 1983–1988（概略、推測）。金属モデルには赤リング年代表もある（Metallic Double Push 1985 銀リング赤文字など）。動画口径：1979–約1990 販売、スライド管、1979–1984 の間に光面金属グリップから波型グリップへ変更 [V1]。二口径を並列表示。"},
+  {id:"standard", name:"Tikky Standard", name_en:"Tikky Standard", name_ja:"Tikky Standard", lo:1983, hi:1986, years:"1983 – 1986", src:"K1; B1; V1", noMarble:true,
+   note:"Tikky 系列最廉价款，除笔夹外全为树脂外壳；日文博客称日本是否发售不明 [B1]。视频口径：0.5mm、3mm 固定管（比 F/T/Special 的 4mm 短）、塑料引芯管；此款最早引入后期通用口袋笔夹样式 [V1]。",
+   note_en:"The most budget model in the Tikky line; all-plastic body except the clip; the Japanese blog says it is unclear whether it was sold in Japan [B1]. Video: 0.5 mm, 3 mm fixed sleeve (shorter than the 4 mm of F/T/Special), plastic lead tube; this model first introduced the later standard pocket clip [V1].",
+   note_ja:"Tikky シリーズ最廉価モデル。クリップ以外は全面樹脂。日本のブログでは日本で販売されたか不明 [B1]。動画口径：0.5mm、3mm 固定管（F/T/Special の 4mm より短い）、プラスチック芯管。このモデルが後の標準ポケットクリップを最初に採用 [V1]。"},
+  {id:"special", name:"Tikky Special", name_en:"Tikky Special", name_ja:"Tikky Special", lo:1983, hi:1998, years:"1983 – 1998", src:"K1; R1; K5; B1",
+   variants:[
+     {label:"Knockology 口径", label_en:"Knockology", label_ja:"Knockology 口径", lo:1983, hi:1998, src:"K1; K5"},
+     {label:"文具病图示口径（初代）", label_en:"Stationeria chart (first gen)", label_ja:"文具病の図解口径（初代）", lo:1984, hi:1988, src:"S1"},
+     {label:"韩国收藏博客口径", label_en:"Korean collector blog", label_ja:"韓国コレクターブログ口径", lo:1979, hi:1996, src:"R1"}
+   ],
+   note:"Knockology 记为 1983–1998；韩国博客口径为 1979–1996；「文具病」图示口径为 1984–1988（初代，笔夹印 W. Germany）。文具病另称其为 Rotring T（1984 年登场）的普及型号，日本定价 500 日元，多色系展开（基本 5 色＋大理石＋珠光＋木屑＋白＋3 硬度套装），大理石色在日本 Sony Plaza 限定发售并卖到 1997 年才交棒 Tikky II。粉大理石明确为 early 1990s；彩虹等其余大理石无独立精确年代记载。三种口径并存，页面不替用户选边，只在结果区并列展示。视频口径：1983–1998，1998 年改版并更名 Tikky 2 [V1]。",
+   note_en:"Knockology: 1983–1998; Korean blog: 1979–1996; Stationeria chart: 1984–1988 (first gen, W. Germany clip). Stationeria also calls it the mass-market sibling of the Rotring T (debut 1984), ¥500 in Japan, with a wide color lineup (5 basics + marble + pearlescent + woodchip + white + 3-hardness sets); marble was a Sony Plaza limited in Japan, sold until 1997 when Tikky II took over. Pink marble is firmly early 1990s; other marbles (rainbow etc.) have no independent precise dating. Three theories coexist; the page shows them side by side. Video: 1983–1998, restyled and renamed Tikky 2 in 1998 [V1].",
+   note_ja:"Knockology では 1983–1998、韓国ブログでは 1979–1996、文具病の図解口径は 1984–1988（初代、クリップ W. Germany）。文具病は Rotring T（1984 年登場）の普及モデルとし、日本価格 500 円、多色展開（基本 5 色＋マーブル＋パール＋木屑＋白＋3 硬度セット）、マーブルは日本では Sony Plaza 限定で 1997 年まで販売され Tikky II へ引き継ぎ。ピンクマーブルは明確に early 1990s、その他のマーブル（レインボー等）に独立した正確な年代記録なし。三口径を並列表示し、ページはどちらかを選ばない。動画口径：1983–1998、1998 年に改版し Tikky 2 へ改名 [V1]。"},
+  {id:"ts_slide", name:"rOtring TS Slide", name_en:"rOtring TS Slide", name_ja:"rOtring TS Slide", lo:1987, hi:1996, years:"1987 – 1996", src:"K1; V1", noMarble:true,
+   note:"滑动护管型号。视频口径：半滑动 5→3mm（供长时间书写）、金属笔夹、金属橡皮帽带圆头塑料件按芯径分色 [V1]。",
+   note_en:"Sliding-sleeve model. Video: half-slide 5→3 mm (for long writing), metal clip, metal eraser cap with a round plastic insert color-coded by lead size [V1].",
+   note_ja:"スライドパイプモデル。動画口径：半スライド 5→3mm（長時間筆記用）、金属クリップ、金属消しゴムキャップに芯径別の色分けされた丸い樹脂部品 [V1]。"},
+  {id:"dp", name:"Tikky Double Push", name_en:"Tikky Double Push", name_ja:"Tikky Double Push", lo:1985, hi:1996, years:"金属 1985–1992 / 塑料 1988/89–1996", years_en:"Metal 1985–1992 / Plastic 1988/89–1996", years_ja:"金属 1985–1992 / プラ 1988/89–1996", src:"K1; V1; K6; K12", noMarble:true,
+   note:"金属版 1985–1992，塑料版起始年有两套口径：Knockology 主帖与视频为 1988，作者本人时间轴图标注为 1989 [K1][V1][K6]。视频口径：金属版全金属件、0.5 后增 0.7、侧钮缩尖；金属版 1992 年改名 Rotring 400 [V1]。塑料版实物在 Knockology 有藏家实拍（全塑料外壳，黑色鼻锥）[K12]。",
+   note_en:"Metal version 1985–1992. The plastic version's start year has two theories: the Knockology thread and video say 1988, the author's own timeline says 1989 [K1][V1][K6]. Video: the metal version is all-metal, 0.5 then 0.7 added, side-button retracting tip; renamed Rotring 400 in 1992 [V1]. Knockology has collector photos of the plastic version (all-plastic body, black nose cone) [K12].",
+   note_ja:"金属版 1985–1992。プラスチック版の開始年は二口径：Knockology スレッドと動画は 1988、作者自身のタイムライン図は 1989 [K1][V1][K6]。動画口径：金属版はオール金属、0.5 後に 0.7 追加、側面ボタンで先端収納。金属版は 1992 年に Rotring 400 へ改名 [V1]。プラ版の実物は Knockology にコレクター撮影あり（全面プラシェル、黒ノーズコーン）[K12]。"},
+  {id:"auto", name:"Tikky Automatic（塑料）", name_en:"Tikky Automatic (plastic)", name_ja:"Tikky Automatic（プラスチック）", lo:1987, hi:1992, years:"1987 – 1992", src:"K1; V1; K10", noMarble:true,
+   variants:[
+     {label:"Knockology 口径", label_en:"Knockology", label_ja:"Knockology 口径", lo:1988, hi:1992, src:"K1"},
+     {label:"Mechanical Pencils 视频口径", label_en:"Mechanical Pencils video", label_ja:"Mechanical Pencils 動画口径", lo:1987, hi:1992, src:"V1"},
+     {label:"rOtring automatics 帖（德国目录口径）", label_en:"rOtring automatics thread (German catalog)", label_ja:"rOtring automatics スレッド（ドイツ目録口径）", lo:1987, hi:1992, src:"K10"}
+   ],
+   note:"自动出芯。视频口径：1987 年发布、1987–1992 在售，0.5mm 塑料杆多色 [V1]。Knockology《rOtring automatics》帖（Heath）：德国目录 1987 年首发、1988 年美国/瑞典目录才标 NEW（德国目录通常比其他国家早一年），与视频 1987 口径互相印证 [K10]。K1 的 1988 起点由此更像「其他市场」口径。三口径并列展示。",
+   note_en:"Automatic lead feed. Video: released 1987, on sale 1987–1992, 0.5 mm plastic barrel in multiple colors [V1]. Knockology's automatics thread (Heath): German catalog debut 1987, only marked NEW in the 1988 US/Sweden catalogs (German catalogs usually run one year ahead) — corroborating the video's 1987 [K10]. K1's 1988 start therefore looks like a \"rest of the world\" theory. Three theories shown side by side.",
+   note_ja:"自動芯出し。動画口径：1987 年発売、1987–1992 販売、0.5mm プラ軸多色 [V1]。Knockology の automatics スレッド（Heath）：ドイツ目録で 1987 年初出、1988 年の米・スウェーデン目録で NEW 表示（ドイツ目録は通常一年先行）、動画の 1987 口径と相互に裏付け [K10]。K1 の 1988 開始は「他市場」口径とみられる。三口径を並列表示。"},
+  {id:"auto_ls", name:"Tikky Automatic LS（金属）", name_en:"Tikky Automatic LS (metal)", name_ja:"Tikky Automatic LS（金属）", lo:1987, hi:1993, years:"1987 – 1993", src:"M1;K1;V1;K10", noMarble:true,
+   variants:[
+     {label:"rOtring Museum 口径", label_en:"rOtring Museum", label_ja:"rOtring Museum 口径", lo:1987, hi:1993, src:"M1;K1"},
+     {label:"Mechanical Pencils 视频口径（仅发布年）", label_en:"Mechanical Pencils video (debut year only)", label_ja:"Mechanical Pencils 動画口径（発売年のみ）", lo:1988, hi:1993, src:"V1"},
+     {label:"rOtring automatics 帖（德国目录口径）", label_en:"rOtring automatics thread (German catalog)", label_ja:"rOtring automatics スレッド（ドイツ目録口径）", lo:1987, hi:1993, src:"K10"}
+   ],
+   note:"rOtring Museum 502 190 条目记为 1987–1993：1987 首版无红环，1988 年起加环；后期机构改为锥形引芯，后过渡为 400 automatic。视频口径：1988 年发布，全金属、红环 + Automatic LS 印字，锁定式出芯（视频未给结束年，此处沿用 rOtring Museum 区间）[V1]。Knockology《rOtring automatics》帖补充细节：首版仅银色杆 + 红色 rOtring logo（无红环），1990 年第二版改为红环 + 银色 automatic LS 文字；LS=locking system，1990 目录描述为「防止口袋里意外出芯」（实际锁定后护芯管仍有约 2mm 突出）；首版型号 502 190；自动机构与 Uni A-Tech / Zebra / Niji X-10 同款 [K10]。",
+   note_en:"rOtring Museum entry 502 190: 1987–1993; the 1987 first version had no red ring, rings were added from 1988; later the mechanism switched to a conical lead tube, then it transitioned into the 400 automatic. Video: released 1988, all-metal, red ring + \"Automatic LS\" imprint, locking lead feed (no end year given in the video; rOtring Museum range used here) [V1]. The automatics thread adds: the first version was only silver with a red rOtring logo (no red ring); the 1990 second version changed to a red ring + silver \"automatic LS\" text; LS = locking system, described in the 1990 catalog as \"prevents accidental lead feed in the pocket\" (actually ~2 mm of sleeve still protrudes when locked); first-version ref. 502 190; same auto mechanism as Uni A-Tech / Zebra / Niji X-10 [K10].",
+   note_ja:"rOtring Museum の 502 190 項目は 1987–1993：1987 初版は赤リングなし、1988 年からリング追加。後期は機構がコニカル芯管になり、後に 400 automatic へ移行。動画口径：1988 年発売、オール金属、赤リング＋Automatic LS 印字、ロック式芯出し（動画は終了年を出しておらず、ここでは rOtring Museum の区間を採用）[V1]。automatics スレッドの補足：初版はシルバー軸＋赤 rOtring ロゴのみ（赤リングなし）、1990 年第二版は赤リング＋シルバーの automatic LS 文字。LS＝locking system、1990 カタログでは「ポケット内での誤出芯防止」と説明（実際はロック時もパイプが約 2mm 突出）。初版品番 502 190。自動機構は Uni A-Tech / Zebra / Niji X-10 と同型 [K10]。"},
+  {id:"r400", name:"Rotring 400（Double Push）", name_en:"Rotring 400 (Double Push)", name_ja:"Rotring 400（Double Push）", lo:1992, hi:1996, years:"1992 – 1996", src:"V1; K10", noMarble:true,
+   note:"视频口径：金属 Tikky Double Push 于 1992 年改名 Rotring 400，杆身与 Double Push 相同、仅印字为 Rotring 400；枪灰 / 亚光银两色，0.5 后增 0.7，金属管；1996 年再改名 Esprit [V1]。Knockology《rOtring automatics》帖（Heath）：1992 年首发于「feather-light」400 系列（1996 年该系列变 Esprit line），石墨 / 亚光银两色，书写锥形笔头、完全可缩回，型号 502 191；机构改用 Kotobuki（同 Niji GRIP700、Platinum Hayaai II、rOtring altro）；两个杆身变体——早期版印 automatic LS 字样 + 红环 + 方块 cap 内嵌 0.5（与零售盒图一致），常见版为红环 + 银色 r0tring 400 + 0.5 近笔夹 + 更圆 cap；1994 年视觉更新为红环上方 rOtring 400 [K10]。两来源互不矛盾、互为补充。",
+   note_en:"Video: the metal Tikky Double Push was renamed Rotring 400 in 1992, same body, only the imprint says Rotring 400; gunmetal / matte silver, 0.5 then 0.7 added, metal sleeve; renamed Esprit in 1996 [V1]. Knockology automatics thread (Heath): debuted 1992 in the \"feather-light\" 400 series (which became the Esprit line in 1996), graphite / matte silver, writing-style conical tip fully retractable, ref. 502 191; mechanism switched to Kotobuki (same as Niji GRIP700, Platinum Hayaai II, rOtring altro); two body variants — an early one imprinted \"automatic LS\" + red ring + square cap with 0.5 inlaid (matching retail box art), and the common one with red ring + silver \"r0tring 400\" + 0.5 near the clip + rounder cap; a 1994 visual update put \"rOtring 400\" above the red ring [K10]. The two sources don't conflict and complement each other.",
+   note_ja:"動画口径：金属 Tikky Double Push は 1992 年に Rotring 400 へ改名。ボディは同一で印字のみ Rotring 400。ガンメタ／マットシルバー、0.5 後に 0.7、金属管。1996 年に Esprit へ再改名 [V1]。Knockology automatics スレッド（Heath）：1992 年「feather-light」400 シリーズで初出（1996 年に Esprit line へ）、グラファイト／マットシルバー、筆記用コニカル先端で完全収納、品番 502 191。機構は Kotobuki 製（Niji GRIP700、Platinum Hayaai II、rOtring altro と同型）。ボディ変種二つ——初期版は automatic LS 文字＋赤リング＋角型 cap に 0.5 埋め込み（小売り箱絵と一致）、一般版は赤リング＋シルバー r0tring 400＋クリップ近くに 0.5＋より丸い cap。1994 年のビジュアル更新で赤リング上に rOtring 400 [K10]。二出典は矛盾せず補完し合う。"},
+  {id:"esprit", name:"Esprit（Double Push）", name_en:"Esprit (Double Push)", name_ja:"Esprit（Double Push）", lo:1996, hi:2006, years:"1996 – 2006", src:"V1; K10", noMarble:true,
+   note:"视频口径：1996 年 Rotring 400 再次改名 Esprit，0.5/0.7 多色；金属杆、金属笔夹与橡皮帽、弹簧可缩尖（侧钮）、红环靠近笔尾、芯径印在笔夹连接处附近 [V1]。Knockology《rOtring automatics》帖：400 系列 1996 年变为 Esprit line（「feather-light」系列）[K10]。此条目主体仍为视频单源，论坛口径作旁证。",
+   note_en:"Video: in 1996 the Rotring 400 was renamed again to Esprit, 0.5/0.7 in multiple colors; metal barrel, metal clip and eraser cap, spring-retractable tip (side button), red ring near the tail, lead size printed near the clip joint [V1]. Knockology automatics thread: the 400 series became the Esprit line in 1996 (\"feather-light\" series) [K10]. This entry is still mostly a single video source, with the forum as supporting evidence.",
+   note_ja:"動画口径：1996 年に Rotring 400 が再び Esprit へ改名。0.5/0.7 多色。金属軸、金属クリップと消しゴムキャップ、スプリング収納式先端（サイドボタン）、赤リングは尻尾寄り、芯径はクリップ接続部付近に印字 [V1]。automatics スレッド：400 シリーズは 1996 年に Esprit line（「feather-light」シリーズ）へ [K10]。本項目の主体は依然動画単源、フォーラムは傍証。"},
+  {id:"sc", name:"Tikky SC", name_en:"Tikky SC", name_ja:"Tikky SC", lo:1999, hi:2000, years:"1999 – 2000", src:"K1; V1; K4", noMarble:true,
+   note:"Super Comfort，软橡胶握胶。视频口径：握胶为 Thermolast K 海绵材质、锥形可缩尖（书写型）、1999–2000 仅售两年 [V1]。rOtring Museum 管理员 Dux 确认：1999 年在售、共 4 色（黑/白/蓝/红）、只有 0.5 与 0.7 两个芯径、少见 [K4]。藏家实物亦确认其笔尖为书写型可缩尖而非绘图长金属管 [K4]。",
+   note_en:"Super Comfort, soft rubber grip. Video: grip is Thermolast K foam material, conical retractable tip (writing type), sold only 1999–2000 [V1]. rOtring Museum curator Dux confirms: on sale in 1999, 4 colors (black/white/blue/red), only 0.5 and 0.7 lead sizes, rare [K4]. Collector photos confirm the tip is a writing-style retractable tip, not a long drawing metal sleeve [K4].",
+   note_ja:"Super Comfort、ソフトラバーグリップ。動画口径：グリップは Thermolast K スポンジ材、コニカル収納式先端（筆記型）、1999–2000 の二年間のみ販売 [V1]。rOtring Museum 管理人 Dux が確認：1999 年販売、全 4 色（黒/白/青/赤）、芯径は 0.5 と 0.7 のみ、希少 [K4]。コレクター実物も筆記型収納先端（製図用の長い金属管ではない）を確認 [K4]。"},
+  {id:"tikky2", name:"Tikky II", name_en:"Tikky II", name_ja:"Tikky II", lo:1997, hi:2008, years:"官方发布 1997；区间 1998–2008", years_en:"Official debut 1997; range 1998–2008", years_ja:"公式発表 1997；区間 1998–2008", src:"O1; O2; K1", noMarble:true,
+   note:"官方品牌史称 1997 年发布；收藏圈区间 1998–2008。罗马尼亚官网记为 1998。视频口径：1998 年 Special 改版更名 Tikky 2，与同期 T 新杆型同杆身、嵌入式金属笔夹、印 Made in Germany，并称其为 3mm 固定管（与 T 新杆型 4mm 的记载略有出入，存疑）[V1]。",
+   note_en:"Official brand history says 1997; collector range 1998–2008; the Romanian site records 1998. Video: in 1998 the Special was restyled and renamed Tikky 2, sharing the body with the new T body, with an inlaid metal clip and \"Made in Germany\" imprint; the video calls it a 3 mm fixed sleeve (slightly conflicting with the 4 mm recorded for the new T body — unverified) [V1].",
+   note_ja:"公式ブランド史は 1997 年発表、コレクター界隈は 1998–2008。ルーマニア公式サイトは 1998 年。動画口径：1998 年に Special が改版され Tikky 2 へ改名。同時期の T 新ボディと同型、埋め込み式金属クリップ、Made in Germany 印字。動画は 3mm 固定管としている（T 新ボディ 4mm の記録と若干矛盾、要検証）[V1]。"},
+  {id:"papermate", name:"Papermate Tikky", name_en:"Papermate Tikky", name_ja:"Papermate Tikky", lo:2008, hi:2009, years:"2008 – 2009", src:"K1; V1; K11", noMarble:true,
+   note:"2008 年生产迁往中国，由 Sanford/Papermate 销售。视频口径：2008 款笔夹完全空白无刻字 [V1]。Knockology《Rotring Tikky a short history》：2008 年 Sanford 收购后品牌短暂改为「Papermate Tikky by rOtring」、目录仅 2008 年出现，2009 年起恢复 Tikky 品牌 [K11]。",
+   note_en:"Production moved to China in 2008, sold by Sanford/Papermate. Video: the 2008 version has a completely blank, unmarked clip [V1]. Knockology's short history: after the Sanford acquisition in 2008 the brand briefly became \"Papermate Tikky by rOtring\", appearing in catalogs only in 2008, reverting to the Tikky brand from 2009 [K11].",
+   note_ja:"2008 年に生産が中国へ移転、Sanford/Papermate が販売。動画口径：2008 年版のクリップは完全に無刻印 [V1]。Knockology の short history：2008 年の Sanford 買収後、ブランドは一時「Papermate Tikky by rOtring」となり、カタログには 2008 年のみ登場、2009 年から Tikky ブランドへ復帰 [K11]。"},
+  {id:"tikky3", name:"Tikky（第三代）", name_en:"Tikky (3rd gen)", name_ja:"Tikky（第3世代）", lo:2009, hi:null, years:"2009 – 至今", years_en:"2009 – present", years_ja:"2009 – 現在", src:"K1; V1", noMarble:true,
+   note:"即 Tikky III，x5 系列。视频口径：2009 年起沿用 Tikky 名，4mm 厚护芯管、2009 后现代款笔夹刻 rOtring [V1]。",
+   note_en:"i.e. Tikky III, x5 series. Video: kept the Tikky name from 2009, 4 mm thick sleeve; post-2009 modern models have \"rOtring\" engraved on the clip [V1].",
+   note_ja:"Tikky III（x5 シリーズ）。動画口径：2009 年から Tikky 名を踏襲、4mm 太パイプ、2009 年以降の現行モデルはクリップに rOtring 刻印 [V1]。"},
+  {id:"retro", name:"Tikky Retro", name_en:"Tikky Retro", name_ja:"Tikky Retro", lo:2024, hi:null, years:"2024 年 4 月起", years_en:"From April 2024", years_ja:"2024 年 4 月以降", src:"K1; V1", colorAllow:["solid"],
+   note:"滑动护管，论坛记载仅红/蓝/灰三色，只有 0.5 与 0.7。视频口径：2024 年发布，滑动可缩管、金属笔夹与橡皮帽 [V1]。",
+   note_en:"Sliding sleeve; the forum records only red/blue/grey, only 0.5 and 0.7. Video: released 2024, sliding retractable sleeve, metal clip and eraser cap [V1].",
+   note_ja:"スライドパイプ。フォーラムの記録では赤/青/灰の三色のみ、0.5 と 0.7 のみ。動画口径：2024 年発売、スライド収納式パイプ、金属クリップと消しゴムキャップ [V1]。"}
+];
+
+/* Tikky 3-in-1：多机能笔（2 圆珠笔 + 1 自动铅笔），作者本人时间轴图已更新纳入，因「技术上是铅笔」；
+   但页面聚焦第一代自动铅笔断代，此条仅作家族完整性参考、不参与年代交叉。 */
+var EXTRA_MODELS = [
+  {id:"tikky3in1", name:"Tikky 3-in-1（多机能笔）", name_en:"Tikky 3-in-1 (multi-function)", name_ja:"Tikky 3-in-1（多機能ペン）", lo:null, hi:null, years:"首发年无可靠记载；2016 年目录与 2025 年团购帖均在售", years_en:"No reliable debut year; sold per the 2016 catalog and 2025 group-buy thread", years_ja:"発売年は信頼できる記録なし；2016 年カタログと 2025 年グループ購入スレッドで販売中", src:"K13; K6", noMarble:true, noCross:true,
+   note:"2 支圆珠笔 + 1 支 0.5mm 自动铅笔；重力/摆锤式切换机构，软胶按扣（非金属）；全塑料杆、Softtouch 握胶、按扣下带橡皮 [K13][K6]。属多机能笔，非纯自动铅笔，本页不参与断代交叉。",
+   note_en:"2 ballpoints + 1 0.5 mm mechanical pencil; gravity/pendulum switching mechanism, soft rubber push button (not metal); all-plastic body, Softtouch grip, eraser under the button [K13][K6]. A multi-function pen, not a pure mechanical pencil — excluded from dating cross-checks here.",
+   note_ja:"ボールペン 2 本＋0.5mm シャープペン 1 本。重力／振り子式の切替機構、ソフトラバー押しボタン（金属ではない）。全面プラ軸、Softtouch グリップ、ボタン下に消しゴム [K13][K6]。多機能ペンであり純粋なシャープペンではないため、このページの断代クロス対象外。"}
+];
+
+var COLORS = [
+  {id:"solid", name:"纯色", name_en:"Solid", name_ja:"無地", group:"solid", note:"覆盖全部纯色（黑/红/蓝/白/黄/草绿/灰/酒红/青绿/粉/紫/橙等）。其中酒红（Burgundy）为 Tikky 标志性色——初代 Special 基本色系即含酒红，官方现行色名 Burgundy（德语 Weinrot、日语 バーガンディ），官方目录中酒红与红（Red）是两个独立色位 [K1][M2]。纯色不单独决定年代，需靠型号与刻印收窄。", note_en:"Covers all solid colors (black/red/blue/white/yellow/grass-green/grey/burgundy/teal/pink/purple/orange, etc.). Burgundy is the signature Tikky color — it was in the 1st-gen Special basic lineup; the current official name is Burgundy (German Weinrot, Japanese バーガンディ), and official catalogs treat burgundy and red as separate color slots [K1][M2]. A solid color alone doesn't date a pen — narrow down with model and imprints.", note_ja:"全無地色をカバー（黒/赤/青/白/黄/若草/グレー/ワイン/青緑/ピンク/紫/オレンジなど）。ワイン（バーガンディ）は Tikky の象徴色——初代 Special の基本色に含まれ、公式の現行色名はバーガンディ（独 Weinrot）。公式カタログではワインと赤は別色 [K1][M2]。無地色だけでは年代を決められない。モデルと刻印で絞り込む。"},
+  {id:"marble", name:"大理石（彩色）", name_en:"Marble (color)", name_ja:"マーブル（カラー）", group:"marble", noScript:true, specialOnly:true, note:"普通彩色大理石：**颜色有很多种**，无权威清单。纹路每支不同，生产延续较久，**有 1.0mm 规格**（即 1996 年白色套装 ISO 切换期仍在产），不是只有 early 1990s；主帖作者本人的大理石收藏里就有 1.0 实物 [K5]。粉大理石为 early 1990s [K1]。传闻整套只在日本 Sony Plaza 发售（帖主注明「听说，未经证实」）[N3][B1]。大理石的 0.5 与 0.7 靠笔尖横纹区分：0.5 无横纹、0.7 有 2 条 [N3]。",
+   note_en:"Ordinary colored marble: **many colors exist**, no authoritative list. Every pen's grain is unique; production ran long, and **a 1.0 mm version exists** (i.e. still in production around the 1996 white-set ISO switch) — not just early 1990s; the main-thread author's own marble collection includes a 1.0 example [K5]. Pink marble is early 1990s [K1]. A rumor says the whole set sold only at Japan's Sony Plaza (labeled \"heard, unverified\") [N3][B1]. Distinguish marble 0.5 vs 0.7 by tip ridges: 0.5 has none, 0.7 has 2 [N3].",
+   note_ja:"普通のカラーマーブル：**色は非常に多い**、権威あるリストはない。紋様は一本ごとに異なり、生産は長く続いた。**1.0mm 仕様もある**（1996 年ホワイトセットの ISO 切替期にも生産）——early 1990s だけではない。メインスレッド作者自身のマーブルコレクションに 1.0 実物あり [K5]。ピンクマーブルは early 1990s [K1]。一説では日本では Sony Plaza 限定販売（「聞いた話、未確認」と投稿者も注記）[N3][B1]。マーブルの 0.5 と 0.7 はペン先横線で判別：0.5 横線なし、0.7 は 2 本 [N3]。"},
+  {id:"marble_rainbow", name:"彩虹大理石", name_en:"Rainbow marble", name_ja:"レインボーマーブル", group:"marble", noScript:true, specialOnly:true, note:"大理石系列里最稀有的一支：纹路为多色绞纹，其余常见大理石为单色纹；彼此纹路都不同。**属早期 Special（约 1990 年代上半期），没有 1.0mm**——若同时看到彩虹大理石与 1.0mm 标示，两者必有一错 [N3]。",
+   note_en:"The rarest in the marble family: multi-color swirled grain, while common marbles are single-color grain; every piece differs. **An early Special (c. first half of the 1990s), and it has NO 1.0 mm** — if you see rainbow marble and a 1.0 mm mark together, one of the two must be wrong [N3].",
+   note_ja:"マーブル系で最も希少な一本：多色の撚り模様で、一般的なマーブルは単色模様。模様は一本ずつ異なる。**初期 Special（1990 年代前半）に属し、1.0mm はない**——レインボーマーブルと 1.0mm 表記を同時に見たら、どちらかが必ず誤り [N3]。"},
+  {id:"woodchip", name:"木屑 / 软木纹", name_en:"Woodchip / cork grain", name_ja:"木屑／コルク調", group:"special_1990s", specialOnly:true, note:"1990 年代 Special 的特殊材质款，木屑混塑料成型，触感粗糙；几乎每支都会变形/歪杆（收藏圈通病），因此二手常见歪杆品。据观察仅单色 [N3]。rOtring Museum 在册（rotringmuseum id=206，列为原始 Tikky 型号）；藏家实测去掉笔尖/笔帽/铅芯/橡皮后，各年代 Tikky 杆身均约 7g [K1 第 3 页]。",
+   note_en:"A special material 1990s Special: wood chips mixed into plastic, rough texture; nearly every piece warps/bends (a known collector issue), so crooked bodies are common used. Observed in a single color only [N3]. In the rOtring Museum registry (rotringmuseum id=206, listed as an original Tikky model); a collector measured ~7 g for the bare body of every era's Tikky [K1 p.3].",
+   note_ja:"1990 年代 Special の特殊素材モデル。木屑をプラに混ぜて成型、手触りは粗い。ほぼすべての個体が変形・曲がる（コレクター界隈の通病）ため、中古では曲がり個体が一般的。観察では単色のみ [N3]。rOtring Museum登録あり（rotringmuseum id=206、オリジナル Tikky モデルとして）。コレクター実測では、先端・キャップ・芯・消しゴムを外した軸本体はどの年代の Tikky も約 7g [K1 p.3]。"},
+  {id:"pearlescent", name:"珠光（珍珠光泽）", name_en:"Pearlescent", name_ja:"パール（真珠光沢）", group:"special_1990s", specialOnly:true, noRecord:true, note:"珠光色系 Special，藏家观察约 mid-1990s；含较常见的「云母灰（mica grey）」，另见青绿/宝蓝/紫红等色，传闻有珠光红 [K5]。无精确年代记载，仅作参考。**并入说明**：文具病所称「灰色亮片」（灰色塑料混细小闪光片，glitter 工艺，据观察仅灰色一款 [N3]）与 Anaz 所称「mica grey」属同一色系、同系列，但两者又略有差异（一称灰底闪光、一称珍珠光泽），此处按「同系列并存」处理。",
+   note_en:"Pearlescent Specials, collector-observed around mid-1990s; includes the fairly common \"mica grey\", also teal/royal blue/plum, rumored pearlescent red [K5]. No precise dating — reference only. **Merger note**: Stationeria's \"grey glitter\" (grey plastic with fine glitter flakes, observed in grey only [N3]) and Anaz's \"mica grey\" are treated here as the same family coexisting, though wording differs (one says grey sparkle, one says pearl sheen).",
+   note_ja:"パール系の Special。コレクター観察では約 mid-1990s。比較的よく見る「マイカグレー（mica grey）」を含み、青緑・ロイヤルブルー・紫紅などもあり、パールレッドの噂も [K5]。正確な年代記録なし、参考のみ。**併合注記**：文具病の「グレーグリッター」（灰色プラに細かいラメ混入、観察ではグレー一色のみ [N3]）と Anaz の「mica grey」は同系色・同シリーズとして併存扱い（表現は「グレーのラメ」「真珠光沢」と微妙に異なる）。"},
+  {id:"clear", name:"透明", name_en:"Clear", name_ja:"透明", group:"clear", note:"透明/半透明杆为 Tikky II 标志性配色；第一代无透明杆——若笔杆透明即可排除第一代。",
+   note_en:"Clear/translucent barrel is a signature Tikky II colorway; the 1st gen never had a clear barrel — a clear barrel rules out the 1st gen.",
+   note_ja:"透明／半透明軸は Tikky II の代表的な配色。初代に透明軸はない——軸が透明なら初代を除外できる。"}
+];
+
+var BARRELS = [
+  {id:"rotring_mark", name:"rOtring", name_en:"rOtring", name_ja:"rOtring", hint:"仅印 rOtring 不能单独定年，需配合型号。", hint_en:"\"rOtring\" alone cannot date a pen — combine with the model.", hint_ja:"rOtring のみの刻印だけでは年代を決められない。モデルと併用する。", warn:false,
+   lo:null, hi:null, noCap:true},
+  {id:"t_mark", name:"T", name_en:"T", name_ja:"T", hint:"笔杆印大写 T，对应 rOtring T 型号 [K1]。", hint_en:"Capital \"T\" on the barrel corresponds to the rOtring T model [K1].", hint_ja:"軸に大文字の T があれば rOtring T モデルに対応 [K1]。", warn:false,
+   lo:null, hi:null, noCap:true},
+  {id:"f_proto_mark", name:"F", name_en:"F", name_ja:"F", hint:"笔杆只印 F 或 rOtring F，没有 Tikky 字样——对应 1978–1983 原型期 rOtring F / GT F。", hint_en:"Only \"F\" or \"rOtring F\" on the barrel, no Tikky text — the 1978–1983 proto-era rOtring F / GT F.", hint_ja:"軸に F または rOtring F のみで Tikky 表記なし——1978–1983 のプロト期 rOtring F / GT F に相当。", warn:false,
+   lo:1978, hi:1983, src:"M2;N6"},
+  {id:"special_mark", name:"Special", name_en:"Special", name_ja:"Special", hint:"笔杆印 Special，对应 Tikky Special 型号 [K1]。", hint_en:"\"Special\" on the barrel corresponds to the Tikky Special model [K1].", hint_ja:"軸の Special 表記は Tikky Special モデルに対応 [K1]。", warn:false,
+   lo:1983, hi:null, src:"K1"},
+  {id:"script_tikky", name:"花体 Tikky", name_en:"Script Tikky", name_ja:"筆記体 Tikky", hint:"花体（草书）Tikky 为初代印刷，日文博客形容为「踊るような」（跳舞般的）字样；见于 Rotring F → Tikky F（1979/1980–1983），延续至 Tikky Special 早期与中期。Dux（rOtring Museum）口径：logo 于 1993 年更换为粗体 [K1][B1][K4]。", hint_en:"The script (cursive) Tikky is first-gen printing, described by the Japanese blog as \"dancing\" lettering; seen on Rotring F → Tikky F (1979/1980–1983) and continuing into early/mid Special. Dux (rOtring Museum): the logo changed to bold in 1993 [K1][B1][K4].", hint_ja:"筆記体（踊るような）の Tikky は初代の印刷。Rotring F → Tikky F（1979/1980–1983）に見られ、Special 初期・中期まで継続。Dux（rOtring Museum）口径：ロゴは 1993 年に太字へ変更 [K1][B1][K4]。", warn:false,
+   lo:null, hi:1993, src:"K1; B1; K4"},
+  {id:"block_tikky", name:"粗体 Tikky", name_en:"Bold Tikky", name_ja:"太字 Tikky", hint:"粗体无衬线 Tikky 约 1993 年起（Dux 口径）及后续型号的印刷方式；大理石 Special 均为粗体或素杆，无花体版本 [K1][B1][K4]。", hint_en:"Bold sans-serif Tikky from c. 1993 (Dux) onward; marble Specials are all bold or unmarked, never script [K1][B1][K4].", hint_ja:"太字サンセリフの Tikky は約 1993 年（Dux 口径）以降および後続モデルの印刷。マーブル Special は全て太字か無表記で、筆記体はない [K1][B1][K4]。", warn:false,
+   lo:1993, hi:null, src:"K4; B1"},
+  {id:"no_barrel_mark", name:"无标", name_en:"Unmarked", name_ja:"無表記", hint:"「无标」无法单独定年，需要靠型号与笔夹判断。", hint_en:"\"Unmarked\" can't date a pen — rely on the model and clip.", hint_ja:"「無表記」だけでは年代を決められない。モデルとクリップで判断する。", warn:true,
+   lo:null, hi:null, noCap:true}
+];
+
+/* 型号与笔杆刻印的互斥关系（用于拦截不可能组合） */
+var BARREL_MODEL_COMPAT = {
+  proto:["f_proto_mark","rotring_mark","no_barrel_mark"],
+  gt:["rotring_mark","no_barrel_mark"],
+  tikky_f:["script_tikky","rotring_mark","no_barrel_mark"],
+  rt:["t_mark","script_tikky","rotring_mark","no_barrel_mark"],
+  standard:["script_tikky","rotring_mark","no_barrel_mark"],
+  special:["special_mark","script_tikky","block_tikky","rotring_mark","no_barrel_mark"],
+  ts_slide:null, dp:null, auto:null, auto_ls:null, sc:null, tikky2:null,
+  r400:["rotring_mark","no_barrel_mark"], esprit:["rotring_mark","no_barrel_mark"],
+  papermate:null, tikky3:null, retro:null
+};
+
+/* 笔夹刻字的三套并存口径：差异在 W. Germany 的结束年（1990 / 1995）与 rOtring 刻字的定位 */
+var THEORY = {
+  B:{key:"B", name:"口径 B（工程师口述）", name_en:"Theory B (engineer)", name_ja:"口径 B（技術者談話）", src:"K1;K6",
+     note:"Knockology 主帖转述 rOtring Museum（Dux）工程师口述，并用收藏实物核对过；主帖作者称「可能更接近现实」：rOtring 用到 1988，W. Germany 用到 1995，之后 Germany。",
+     note_en:"Relays rOtring Museum (Dux) engineer statements, cross-checked with collector pieces; the thread author says it is \"probably closer to reality\": rOtring until 1988, W. Germany until 1995, then Germany.",
+     note_ja:"Knockology スレッドが rOtring Museum（Dux）技術者の談話を転載し、コレクション実物で照合。投稿者は「現実に近い可能性が高い」と述べる：rOtring は 1988 年まで、W. Germany は 1995 年まで、以降 Germany。",
+     clip:{
+       blank_fake:{lo:null, hi:null, noCap:true, years:"假货/后配（不参与年代计算）", years_en:"Fake/replaced (excluded)", years_ja:"偽物／後付け（年代計算に不参加）"},
+       blank_clip:{lo:null, hi:1988, noCap:true,  years:"约 1988 之前（早期，仅参考）", years_en:"c. before 1988 (early, ref. only)", years_ja:"約 1988 以前（初期、参考のみ）"},
+       rotring_clip:{lo:null, hi:1988, noCap:true, years:"出现于 1988 之前；2008 后现代款复用", years_en:"Before 1988; reused by modern models post-2008", years_ja:"1988 年以前；2008 年以降の現行モデルで再使用"},
+       wgermany_clip:{lo:1988, hi:1995, noCap:false, years:"约 1988 – 1995", years_en:"c. 1988 – 1995", years_ja:"約 1988 – 1995"},
+       germany_clip:{lo:1995, hi:null, noCap:false, years:"约 1995 之后", years_en:"c. after 1995", years_ja:"約 1995 以降"}
+     }},
+  A:{key:"A", name:"口径 A（行业规律）", name_en:"Theory A (industry rule)", name_ja:"口径 A（業界通則）", src:"K1;F1",
+     note:"行业普遍规律：两德统一（1990）后德国笔具陆续改刻 Germany，1988–1990 为「W. Germany / Germany 并存」过渡期。此口径下 W. Germany 的上限约到 1990。",
+     note_en:"Common industry rule: after German reunification (1990) German pens gradually switched to \"Germany\"; 1988–1990 was a \"W. Germany / Germany coexist\" transition. Under this theory W. Germany ends c. 1990.",
+     note_ja:"業界の通則：ドイツ再統一（1990）後、ドイツ製ペンは順次 Germany 表記へ。1988–1990 は「W. Germany / Germany 併存」の過渡期。この口径では W. Germany の上限は約 1990。",
+     clip:{
+       blank_fake:{lo:null, hi:null, noCap:true, years:"假货/后配（不参与年代计算）", years_en:"Fake/replaced (excluded)", years_ja:"偽物／後付け（年代計算に不参加）"},
+       blank_clip:{lo:null, hi:1988, noCap:true,  years:"约 1988 之前（早期，仅参考）", years_en:"c. before 1988 (early, ref. only)", years_ja:"約 1988 以前（初期、参考のみ）"},
+       rotring_clip:{lo:null, hi:1988, noCap:true, years:"出现于 1988 之前；2008 后现代款复用", years_en:"Before 1988; reused by modern models post-2008", years_ja:"1988 年以前；2008 年以降の現行モデルで再使用"},
+       wgermany_clip:{lo:null, hi:1990, noCap:true, years:"至 1990（两德统一后切换；上限仅参考）", years_en:"Until 1990 (switch after reunification; upper bound ref. only)", years_ja:"1990 まで（再統一後に切替、上限は参考のみ）"},
+       germany_clip:{lo:1990, hi:null, noCap:false, years:"约 1990 之后（1990–1995 过渡重叠）", years_en:"c. after 1990 (1990–1995 overlap)", years_ja:"約 1990 以降（1990–1995 は重複期）"}
+     }},
+  C:{key:"C", name:"口径 C（日本实测）", name_en:"Theory C (Japan test)", name_ja:"口径 C（日本実測）", src:"N1",
+     note:"日本收藏博客 2009 年实物实测口径：笔夹带 W.Germany 刻字即判断为 1990 年 10 月以前生产。是最保守、最早的切换点。",
+     note_en:"A Japanese collector blog's 2009 physical test: a W.Germany clip imprint means production before October 1990. The most conservative, earliest switch point.",
+     note_ja:"日本の収集ブログの 2009 年実物実測口径：クリップに W.Germany 刻印があれば 1990 年 10 月以前の製造と判断。最も保守的で最も早い切替点。",
+     clip:{
+       blank_fake:{lo:null, hi:null, noCap:true, years:"假货/后配（不参与年代计算）", years_en:"Fake/replaced (excluded)", years_ja:"偽物／後付け（年代計算に不参加）"},
+       blank_clip:{lo:null, hi:1988, noCap:true,  years:"约 1988 之前（早期，仅参考）", years_en:"c. before 1988 (early, ref. only)", years_ja:"約 1988 以前（初期、参考のみ）"},
+       rotring_clip:{lo:null, hi:1988, noCap:true, years:"出现于 1988 之前；2008 后现代款复用", years_en:"Before 1988; reused by modern models post-2008", years_ja:"1988 年以前；2008 年以降の現行モデルで再使用"},
+       wgermany_clip:{lo:null, hi:1990, noCap:true, years:"至 1990 年 10 月（上限仅参考）", years_en:"Until Oct 1990 (upper bound ref. only)", years_ja:"1990 年 10 月まで（上限は参考のみ）"},
+       germany_clip:{lo:1990, hi:null, noCap:false, years:"1990 之后", years_en:"After 1990", years_ja:"1990 以降"}
+     }}
+};
+function clipRule(id){ return (THEORY[state.theory]||THEORY.B).clip[id] || {}; }
+
+/* 笔径（芯径）：被低估的年代硬指标。
+   关键年代锚点：
+   - 0.3 与 0.9 是第一代（1983–1996）德系标示；1996 年白色套装起 0.3→0.35、0.9→1.0。
+   - 0.9 只在第一代存在，1996 年白色套装切换期起改标 1.0——看到 0.9 可直接排除 Tikky II 及以后。
+   - 0.5 与 0.7 贯穿全系，本身不带年代信号。 */
+var MARKINGS = [
+  {id:"core_03", name:"0.3mm", name_en:"0.3mm", name_ja:"0.3mm", src:"N2;M4", lo:1983, hi:1996, years:"约 1983 – 1996", years_en:"c. 1983 – 1996", years_ja:"約 1983 – 1996", noCap:false,
+   note:"早期德系按亚洲习惯标 0.3；1996 年白色套装起改用 ISO 0.35。看到杆上标 0.3，可锁定 1996 年之前。早期 0.3 印字为黄色（文具病单源），笔尖 1 圈横纹、内部出芯机构塑料为红色。[N2][M4]",
+   note_en:"Early German pens used 0.3 per Asian convention; the 1996 white set switched to ISO 0.35. A 0.3 imprint pins the pen before 1996. Early 0.3 imprint was yellow (single source: Stationeria); tip has 1 ridge, inner feed plastic is red. [N2][M4]",
+   note_ja:"初期のドイツ製はアジア慣例で 0.3 表記。1996 年ホワイトセットから ISO 0.35 へ。0.3 表記なら 1996 年以前と確定。初期 0.3 の印字は黄色（文具病のみ）、ペン先横線 1 本、内部機構プラは赤。[N2][M4]"},
+  {id:"core_035", name:"0.35mm", name_en:"0.35mm", name_ja:"0.35mm", src:"M4", lo:1996, hi:null, years:"约 1996 之后", years_en:"c. after 1996", years_ja:"約 1996 以降", noCap:false,
+   note:"1996 年白色套装起改用 ISO 0.35。看到 0.35 可基本锁定 1996 年之后；与 W. Germany 笔夹不可能共存。笔尖 1 圈横纹、内部塑料红色。[M4]",
+   note_en:"The 1996 white set switched to ISO 0.35. A 0.35 imprint basically pins the pen after 1996; it cannot coexist with a W. Germany clip. Tip has 1 ridge, inner plastic red. [M4]",
+   note_ja:"1996 年ホワイトセットから ISO 0.35 へ。0.35 表記ならほぼ 1996 年以降。W. Germany クリップとは共存不可能。ペン先横線 1 本、内部プラ赤。[M4]"},
+  {id:"core_05", name:"0.5mm", name_en:"0.5mm", name_ja:"0.5mm", src:"", lo:null, hi:null, years:"—", noCap:true,
+   note:"贯穿全系，本身不带年代信号。笔尖无横纹、内部塑料黑色。",
+   note_en:"Present across the whole line; carries no dating signal by itself. Tip has no ridge, inner plastic black.",
+   note_ja:"全シリーズに存在。それ自体は年代信号を持たない。ペン先横線なし、内部プラ黒。"},
+  {id:"core_07", name:"0.7mm", name_en:"0.7mm", name_ja:"0.7mm", src:"", lo:null, hi:null, years:"—", noCap:true,
+   note:"贯穿全系。笔尖 2 圈横纹、内部塑料蓝色。",
+   note_en:"Present across the whole line. Tip has 2 ridges, inner plastic blue.",
+   note_ja:"全シリーズに存在。ペン先横線 2 本、内部プラ青。"},
+  {id:"core_09", name:"0.9mm", name_en:"0.9mm", name_ja:"0.9mm", src:"M4;N2;K5", lo:1983, hi:1996, years:"约 1983 – 1996（仅第一代）", years_en:"c. 1983 – 1996 (1st gen only)", years_ja:"約 1983 – 1996（初代のみ）", noCap:false,
+   note:"0.9 只存在于第一代（Special 早期四尺寸之一，早期德系/亚洲标法）；1996 年白色套装 ISO 切换期起改标 1.0（同一物理芯径）。看到 0.9 可直接排除第二代及以后型号。早期 0.9 印字为橙色（文具病单源）。笔尖 3 圈横纹、内部塑料透明。[M4][N2][K5]",
+   note_en:"0.9 exists only in the 1st gen (one of the early Special's four sizes, early German/Asian marking); the 1996 white set switched to ISO 1.0 (same physical lead). A 0.9 imprint rules out the 2nd gen and later. Early 0.9 imprint was orange (single source: Stationeria). Tip has 3 ridges, inner plastic clear. [M4][N2][K5]",
+   note_ja:"0.9 は初代のみに存在（初期 Special の四サイズの一つ、初期ドイツ／アジア表記）。1996 年ホワイトセットの ISO 切替期から 1.0 表記へ（同一物理芯径）。0.9 表記なら第 2 世代以降を除外できる。初期 0.9 の印字はオレンジ（文具病のみ）。ペン先横線 3 本、内部プラ透明。[M4][N2][K5]"},
+  {id:"core_10", name:"1.0mm", name_en:"1.0mm", name_ja:"1.0mm", src:"M4;K5", lo:1996, hi:null, years:"约 1996 之后", years_en:"c. after 1996", years_ja:"約 1996 以降", noCap:false,
+   note:"ISO 标示（JIS 0.9 同芯径）：1996 年白色套装切换期起出现于一代末期（大理石款亦有 1.0 实物 [K5]），Tikky II 沿用。笔尖 3 圈横纹、内部塑料透明。[M4][K5]",
+   note_en:"ISO mark (same lead as JIS 0.9): appeared with the 1996 white-set switch in the late 1st gen (marble pens also exist in 1.0, [K5]); Tikky II kept it. Tip has 3 ridges, inner plastic clear. [M4][K5]",
+   note_ja:"ISO 表記（JIS 0.9 と同芯径）：1996 年ホワイトセット切替期に初代後期で出現（マーブルにも 1.0 実物あり [K5]）、Tikky II も踏襲。ペン先横線 3 本、内部プラ透明。[M4][K5]"},
+  {id:"n/a", name:"没注意 / 不适用", name_en:"Not noticed / N/A", name_ja:"見ていない／該当なし", src:"", lo:null, hi:null, years:"—", noCap:true,
+   note:"辅助指标，不选不影响主判定。",
+   note_en:"Auxiliary clue; skipping it doesn't affect the main result.",
+   note_ja:"補助指標。選ばなくても主判定に影響しない。"}
+];
+
+var CLIPS = [
+  {id:"blank_clip", name:"无文字（仅压印 rOtring 圆标）", name_en:"No text (embossed rOtring round logo only)", name_ja:"文字なし（rOtring 丸ロゴのエンボスのみ）", noCap:true, src:"K1;K8",
+   note:"Knockology 论坛实物（R502155）确认：全金属 S Metallic（1980–1983）笔身上完全无字，笔夹只有压印的 rOtring 圆形 logo，没有 \"rOtring\" 英文字、没有 W.Germany/Germany [K8]。**塑料量产款（Special/Tikky F/rOtring T）若笔夹完全空白（连压印 logo 都没有），不是原装特征**，需复核笔夹是否后配或被打磨。",
+   note_en:"Confirmed by the Knockology R502155 piece: the all-metal S Metallic (1980–1983) has no text on the body and only an embossed rOtring round logo on the clip — no \"rOtring\" lettering, no W.Germany/Germany [K8]. **A plastic production model (Special/Tikky F/rOtring T) with a completely blank clip (not even an embossed logo) is NOT an original feature** — check whether the clip was replaced or polished off.",
+   note_ja:"Knockology の実物（R502155）で確認：オール金属 S Metallic（1980–1983）はボディに文字なし、クリップは rOtring 丸ロゴのエンボスだけ。\"rOtring\" の英字も W.Germany/Germany もない [K8]。**プラスチック量産モデル（Special/Tikky F/rOtring T）でクリップが完全無地（エンボスすらない）なら、純正の特徴ではない**——後付けか研磨を疑う。"},
+  {id:"blank_fake", name:"完全空白（无任何 logo/刻字）", name_en:"Completely blank (no logo/marking)", name_ja:"完全無地（ロゴ・刻印なし）", noCap:true, src:"",
+   note:"笔夹上既没有压印 rOtring 圆标，也没有 rOtring / W.Germany / Germany 任何刻字。所有正品一代 Tikky 笔夹至少有压印圆标或刻字之一；完全空白 = 假货、后配笔夹，或笔夹被打磨掉。",
+   note_en:"No embossed rOtring round logo and no rOtring / W.Germany / Germany marking. Every genuine 1st-gen Tikky clip has at least an embossed round logo or a marking; completely blank = fake, replaced clip, or the marking was polished off.",
+   note_ja:"rOtring 丸ロゴのエンボスも、rOtring / W.Germany / Germany の刻印もない。正規品の初代 Tikky クリップは必ずどちらかがある。完全無地＝偽物、後付けクリップ、または研磨で消えた状態。"},
+  {id:"rotring_clip", name:"rOtring", name_en:"rOtring", name_ja:"rOtring", noCap:true, src:"K1",
+   note:"通用/早期标：按红环工程师口径 rOtring 刻字用到 1988，Tikky F（1979–1983）与 Special 早期（1983–1988）均使用；2008 后现代款又复用 rOtring 刻字 [K1]。因此它只能证明「这支笔不晚于某个早期批次」，不能用来截断上限，本页只作参考展示。",
+   note_en:"Generic/early mark: per the rOtring engineer, the rOtring imprint ran until 1988, used on Tikky F (1979–1983) and early Special (1983–1988); post-2008 modern models reuse it [K1]. It only proves \"no later than an early batch\" — it can't cap the upper bound, shown here as reference only.",
+   note_ja:"汎用／初期の刻印。rOtring 技術者口径では 1988 年まで使用、Tikky F（1979–1983）と Special 初期（1983–1988）で採用。2008 年以降の現行モデルで再使用 [K1]。よって「ある初期ロットより新しいことはない」ことしか証明できず、上限の確定には使えない。ここでは参考表示のみ。"},
+  {id:"wgermany_clip", name:"rOtring W. Germany", name_en:"rOtring W. Germany", name_ja:"rOtring W. Germany", noCap:false, src:"K1;K6;N1",
+   note:"三套口径对它的结束年不一致：口径 B（工程师）用到 1995，口径 A（行业规律）1990 统一后切换，口径 C（日本实测）1990 年 10 月以前。共识：W. Germany ⇒ 1995 年之前。",
+   note_en:"The three theories disagree on its end year: B (engineer) until 1995, A (industry rule) switch after 1990 reunification, C (Japan test) before Oct 1990. Consensus: W. Germany ⇒ before 1995.",
+   note_ja:"三口径で終了年が一致しない：B（技術者）1995 年まで、A（業界通則）1990 年再統一後に切替、C（日本実測）1990 年 10 月以前。共通認識：W. Germany ⇒ 1995 年以前。"},
+  {id:"germany_clip", name:"rOtring Germany", name_en:"rOtring Germany", name_ja:"rOtring Germany", noCap:false, src:"K1;F1;K6",
+   note:"共识：Germany ⇒ 1990 年之后。具体起点随口径不同（A/C 起 1990，B 起 1995）；1990–1995 为过渡重叠期。",
+   note_en:"Consensus: Germany ⇒ after 1990. The exact start varies by theory (A/C from 1990, B from 1995); 1990–1995 is a transition overlap.",
+   note_ja:"共通認識：Germany ⇒ 1990 年以降。具体的な開始年は口径により異なる（A/C は 1990、B は 1995）。1990–1995 は過渡的な重複期。"}
+];
+
+/* 护芯管类型 → 型号映射（日文目录派 + Museum 档案） */
+var SLEEVES = [
+  {id:"fixed", name:"固定 4mm", name_en:"Fixed 4mm", name_ja:"固定 4mm", src:"N6;M2",
+   note:"护芯管不随磨损后退。Tikky F、1984 年起（bungu-talk 口径）/ 1987 年起（Mechanical Pencils 视频与 Knockology 时间轴口径）的 rOtring T、以及**整个 Special 世代**都是固定管 [N6][M2][V1]。",
+   note_en:"The sleeve doesn't retract. Tikky F, the rOtring T from 1984 (bungu-talk) / 1987 (video & Knockology timeline), and **the entire Special era** are fixed [N6][M2][V1].",
+   note_ja:"パイプは収納されない。Tikky F、rOtring T は 1984 年以降（bungu-talk 口径）/ 1987 年以降（動画・Knockology タイムライン口径）、および**Special 世代全体**が固定管 [N6][M2][V1]。",
+   allow:["tikky_f","rt","standard","special","dp","auto","auto_ls","tikky2","papermate","tikky3","retro"]},
+  {id:"half", name:"半滑动 3.5–5mm", name_en:"Half-slide 3.5–5mm", name_ja:"半スライド 3.5–5mm", src:"N6;K6;V1",
+   note:"在 3.5–5mm 间半退：只出现在早期 rOtring T（bungu-talk 口径至 1984 前 / 视频与时间轴口径至 1987 前）与 TS Slide（1987–1996）[N6][K6][V1]。",
+   note_en:"Half-retracting within 3.5–5 mm: only the early rOtring T (bungu-talk: before 1984 / video & timeline: before 1987) and the TS Slide (1987–1996) [N6][K6][V1].",
+   note_ja:"3.5–5mm の間で半収納：初期 rOtring T（bungu-talk 口径 1984 前 / 動画・タイムライン口径 1987 前）と TS Slide（1987–1996）のみ [N6][K6][V1]。",
+   allow:["rt","ts_slide"]},
+  {id:"full", name:"全滑动 0–3mm", name_en:"Full-slide 0–3mm", name_ja:"全スライド 0–3mm", src:"N6;M4",
+   note:"可完全退入：rOtring S / S Metallic（约 1979–1988）[N6]。",
+   note_en:"Fully retractable: rOtring S / S Metallic (c. 1979–1988) [N6].",
+   note_ja:"完全収納可：rOtring S / S Metallic（約 1979–1988）[N6]。",
+   allow:["s_plastic","s_metal"]},
+  {id:"double", name:"双敲缩回（整段缩回）", name_en:"Double-push retract (whole unit)", name_ja:"ダブルプッシュ収納（機構ごと収納）", src:"M2;V1",
+   note:"按侧钮把整段机构缩进杆内：Tikky Double Push（金属 1985–1992 / 塑料 1988–1996）、Rotring 400（1992–1996）、Esprit（1996–2006）均为双敲机构 [M2][V1]。",
+   note_en:"Side button retracts the whole unit into the barrel: Tikky Double Push (metal 1985–1992 / plastic 1988–1996), Rotring 400 (1992–1996), Esprit (1996–2006) all use double-push [M2][V1].",
+   note_ja:"サイドボタンで機構全体を軸内へ収納：Tikky Double Push（金属 1985–1992 / プラ 1988–1996）、Rotring 400（1992–1996）、Esprit（1996–2006）がすべてダブルプッシュ機構 [M2][V1]。",
+   allow:["dp","r400","esprit"]},
+  {id:"cone", name:"锥形可缩（书写型）", name_en:"Conical retractable (writing type)", name_ja:"コニカル収納（筆記型）", src:"K7",
+   note:"没有长金属护芯管、锥形尖可缩：Tikky SC（1999–2000）[K7]。",
+   note_en:"No long metal sleeve; conical tip retracts: Tikky SC (1999–2000) [K7].",
+   note_ja:"長い金属パイプがなく、コニカル先端が収納される：Tikky SC（1999–2000）[K7]。",
+   allow:["sc"]},
+  {id:"unsure", name:"不确定 / 没注意", name_en:"Unsure / not noticed", name_ja:"不明／見ていない", src:"",
+   note:"不选不影响主判定。",
+   note_en:"Skipping it doesn't affect the main result.",
+   note_ja:"選ばなくても主判定に影響しない。",
+   allow:null}
+];
+function sleeveIncompatible(modelId, sleeveId){
+  var s = SLEEVES.filter(function(x){return x.id===sleeveId;})[0];
+  if(!s || !s.allow) return false;
+  return s.allow.indexOf(modelId) < 0;
+}
+
+/* 帽顶形状：早期为「收藏圈观察」，现已挖到部分文字证据：
+   - 金属头带塑料圆顶（丸い樹脂）：日文 bungu-talk 明确记载——初版 rOtring T（1980 起、小豆色轴）与 rOtring S 帽顶均有圆树脂件；白杆三硬度套也有；1984 年新版 T（固定 4mm 管）明确改为「无树脂件的普通金属帽」；TS slide 存在「帽顶树脂被移除」的版本差异 [N6]。
+   - 金属圆头（dome）：Tikky metallic S 被主帖 Criterium 描述为「domed eraser cap」（圆顶橡皮帽）[K1]；Special 量产版圆头/平头并存的年代对应仍无文字证据。
+   - 金属头镂空/棱角：bungu-talk 记载 Esprit（1997）帽顶改为有棱角形状（角ばった），镂空是后期版本方向，一代塑料款不标配 [N6]。 */
+var CAPS = [
+  {id:"cap_dome", name:"金属圆头", name_en:"Metal dome", name_ja:"金属ドーム", src:"实物图观察;藏家描述", src_en:"Photo observation; collector description", src_ja:"実物写真の観察；コレクターの記述",
+   note:"金属帽顶面为微圆弧（dome）。文字佐证：Tikky metallic S 被主帖 Criterium 描述为「domed eraser cap」（圆顶橡皮帽）[K1]。收藏圈观察推断为 Tikky Special 后期（约 1989 年后）常见帽顶；与平头款并存，红白黑大理石各配色均见。暂无官方文字证据，仅作参考。",
+   note_en:"The metal cap top has a slight dome. Textual evidence: Criterium in the main thread describes the Tikky metallic S as having a \"domed eraser cap\" [K1]. Collector observation suggests this is the common cap top of the later Special (c. after 1989); it coexists with the flat top and appears in red/white/black and marble colorways. No official textual evidence yet — reference only.",
+   note_ja:"金属キャップの先端が緩やかなドーム状。文献的裏付け：メインスレッドの Criterium が Tikky metallic S を「domed eraser cap（ドーム型消しゴムキャップ）」と記述 [K1]。コレクター観察では Special 後期（約 1989 年以降）に多いと推測。フラットと併存し、赤白黒・マーブル各配色で見られる。公式の文献証拠はまだなく、参考のみ。"},
+  {id:"cap_flat", name:"金属平头", name_en:"Metal flat", name_ja:"金属フラット", src:"实物图观察;藏家经验", src_en:"Photo observation; collector experience", src_ja:"実物写真の観察；コレクターの経験",
+   note:"金属帽顶面为平切截面。bungu-talk 记载 1984 年新版 rOtring T（固定 4mm 管）与 Tikky F 同为「普通金属帽、无树脂件」[N6]——平头/圆头都属于这类普通金属帽的细分。**收藏圈观察推断为 Tikky Special 早期（约 1983–1989）常见帽顶**——早期基本色（红白黑黄蓝 0.5/0.7）与 1990s 套装图多为此形态。与圆头款并存，暂无官方文字证据，仅作参考。",
+   note_en:"The metal cap top is flat-cut. bungu-talk records that the 1984 new rOtring T (fixed 4 mm sleeve) and the Tikky F both have a \"plain metal cap, no resin part\" [N6] — flat and dome are both subtypes of this plain metal cap. **Collector observation suggests the flat top is common on the early Special (c. 1983–1989)** — early base colors (red/white/black/yellow/blue 0.5/0.7) and 1990s set photos mostly show this form. It coexists with the dome; no official textual evidence yet — reference only.",
+   note_ja:"金属キャップ先端が平面の切り口。bungu-talk は 1984 年新 rOtring T（固定 4mm 管）と Tikky F を「樹脂部品なしの普通の金属キャップ」と記録 [N6]——フラットもドームもこの普通の金属キャップの下位分類。**コレクター観察では Special 初期（約 1983–1989）に多いと推測**——初期基本色（赤白黒黄青 0.5/0.7）と 1990s セット写真の多くがこの形態。ドームと併存。公式の文献証拠はまだなく、参考のみ。"},
+  {id:"cap_plastic", name:"金属头带塑料圆顶", name_en:"Metal top with plastic dome", name_ja:"金属＋樹脂ドーム", src:"N6",
+   note:"帽顶凸出一颗圆形树脂球（日文「丸い樹脂」）。日文 bungu-talk 明确记载：初版 rOtring T（1980 起、小豆色轴）与 rOtring S 帽顶均有圆树脂件；白杆三硬度套也有；**1984 年新版 T 明确改为无树脂件的普通金属帽**，TS slide 也存在「帽顶树脂被移除」的版本差异 [N6]。Tikky Special 量产版**不标配**这种圆树脂球——若 Special 出现此帽顶，需复核是否为 T/S 或三硬度套混装。",
+   note_en:"A round resin ball protrudes from the cap top (Japanese \"丸い樹脂\"). bungu-talk explicitly records it on the first rOtring T (from 1980, bean-red barrel) and the rOtring S; the white 3-hardness set has it too; **the 1984 new T explicitly changed to a plain metal cap without the resin part**, and the TS Slide has a version where the resin was removed [N6]. Production Specials are **not** fitted with this ball as standard — if a Special shows it, check whether it is a T/S or a mixed set.",
+   note_ja:"キャップ先端から丸い樹脂球が突出（日本語では「丸い樹脂」）。bungu-talk は初版 rOtring T（1980 年から、小豆色軸）と rOtring S のキャップに丸い樹脂部品があると明記。白軸 3 硬度セットにもある。**1984 年新 T は樹脂なしの普通金属キャップに明確に変更**、TS Slide には樹脂が外された版差もある [N6]。Special 量産版にこの樹脂球は**標準装備ではない**——Special でこれがあれば T/S か 3 硬度セットの混載を再確認する。"},
+  {id:"cap_holed", name:"金属头镂空", name_en:"Metal top with cutout", name_ja:"金属中空（くり抜き）", src:"藏家观察;N6", src_en:"Collector observation; N6", src_ja:"コレクター観察；N6",
+   note:"帽顶金属件带镂空/开槽。方向性佐证：bungu-talk 记载 Esprit（1997）帽顶改为有棱角形状（角ばった）[N6]——镂空/棱角是后期版本方向。收藏圈观察属后期版本（Tikky II/III 或更新款）的特征；一代塑料款（Tikky F / rOtring T / Tikky Special）不标配——若一代款出现此帽顶，疑为后换件。具体型号实物细节待藏家补充。",
+   note_en:"The metal cap part has a cutout/slot. Directional evidence: bungu-talk records the Esprit (1997) cap top changing to an angular shape (角ばった) [N6] — cutout/angular is the later direction. Collector observation treats it as a feature of later versions (Tikky II/III or newer); 1st-gen plastic models (Tikky F / rOtring T / Tikky Special) don't come with it standard — if a 1st-gen pen shows it, suspect a replaced part. Physical details for specific models await collector input.",
+   note_ja:"キャップの金属部にくり抜き・スロットがある。方向性の裏付け：bungu-talk は Esprit（1997）のキャップ先端が角ばった形に変わったと記録 [N6]——中空・角形は後期の方向。コレクター観察では後期バージョン（Tikky II/III 以降）の特徴。初代プラモデル（Tikky F / rOtring T / Tikky Special）には標準装備なし——初代でこれがあれば後付け部品を疑う。具体的なモデル別の実物詳細はコレクターの追加情報待ち。"},
+  {id:"cap_n", name:"没注意 / 不确定", name_en:"Not noticed / unsure", name_ja:"見ていない／不明", src:"",
+   note:"辅助特征，不选不影响主判定。",
+   note_en:"Auxiliary clue; skipping it doesn't affect the main result.",
+   note_ja:"補助的な特徴。選ばなくても主判定に影響しない。"}
+];
+
+var RINGS = [
+  {id:"red_ring", name:"红环", name_en:"Red ring", name_ja:"赤リング", src:"P1;K3;M2;M4",
+   note:"红环自 1930 年代起为 rOtring 商标符号，但不是每支 Tikky 都有：首代 Special 明确无红环，1996 年白色套装才全面改红环 [M2][M4]；Tikky automatic 1987 起为红环 [K3]；1980 年代白杆三硬度套、TS Slide 也有红环，所以红环单独不能定年 [N6]。", warn:false,
+   note_en:"The red ring has been an rOtring trademark symbol since the 1930s, but not every Tikky has one: the first Special explicitly had none, and the full switch came with the 1996 white set [M2][M4]; Tikky automatic had the red ring from 1987 [K3]; the 1980s white 3-hardness set and the TS Slide also have it, so a red ring alone can't date a pen [N6].",
+   note_ja:"赤リングは 1930 年代からの rOtring 商標シンボルだが、すべての Tikky にあるわけではない：初代 Special には明確になく、1996 年ホワイトセットで全面採用 [M2][M4]。Tikky automatic は 1987 年から赤リング [K3]。1980 年代の白軸 3 硬度セットや TS Slide にもあるため、赤リング単独では年代を決められない [N6]。"},
+  {id:"size_ring", name:"芯径分色环（黄/棕/蓝）", name_en:"Lead-size color ring (yellow/brown/blue)", name_ja:"芯径別カラーリング（黄/茶/青）", src:"M3",
+   note:"1989 年白色三硬度套：环按芯径分色——0.3 黄、0.5 棕、0.7 蓝，且环变窄、端部改圆角；同期笔夹仍是 W.Germany。这个组合的年份窗口极窄（1989–1990），是少见的高置信特征 [M3]。", warn:false,
+   note_en:"The 1989 white 3-hardness set: rings color-coded by lead size — 0.3 yellow, 0.5 brown, 0.7 blue — with narrower rings and rounded ends; the clip was still W.Germany then. This combination has an extremely narrow window (1989–1990) — a rare high-confidence feature [M3].",
+   note_ja:"1989 年ホワイト 3 硬度セット：リングが芯径別に色分け——0.3 黄、0.5 茶、0.7 青。リングは細くなり端部は丸角。同時期のクリップはまだ W.Germany。この組み合わせの年幅は極めて狭く（1989–1990）、珍しい高信頼の特徴 [M3]。"},
+  {id:"color_ring", name:"其他颜色环（银/蓝/绿等）", name_en:"Other ring colors (silver/blue/green, etc.)", name_ja:"その他のリング色（銀/青/緑など）", src:"K2;M5",
+   note:"环色多样性无系统年代记载；金属款有明确年表：Metallic Double Push 1985 为银环+红字，1987 增蓝/黑/红且环字皆银，1990 改红环并去掉杆上 rotring 字 [M5]。", warn:false,
+   note_en:"No systematic dating for the variety of ring colors; metal models have a clear timeline: Metallic Double Push 1985 silver ring + red text, 1987 adds blue/black/red with all-silver ring and text, 1990 switches to a red ring and drops the \"rOtring\" barrel text [M5].",
+   note_ja:"リング色の多様性に体系的な年代記録はない。金属モデルには明確な年表がある：Metallic Double Push 1985 は銀リング＋赤文字、1987 年は青/黒/赤が加わりリングも文字も銀、1990 年に赤リングへ変更し軸の rOtring 文字を削除 [M5]。"},
+  {id:"no_ring", name:"无环", name_en:"No ring", name_ja:"リングなし", src:"M2;K10;M4",
+   note:"无环是 Tikky Special 的主流形态：1996 年白色套装全面红环之前基本无环（1983/84 首发起即无环），覆盖面广、不定年，仅作参考。Tikky automatic LS 红环起点有分歧：rOtring Museum 口径 1988 年起加环、Heath 帖口径 1990 年第二版才改红环（首版仅银杆+红色 rOtring logo 字样）[M1][M2][K10]。", warn:false,
+   note_en:"No ring is the standard form of the Tikky Special: it was mostly ringless from the 1983/84 launch until the full red-ring switch in the 1996 white set — too broad to date, reference only. The Tikky automatic LS red-ring start is disputed: rOtring Museum says rings from 1988, Heath's thread says the 1990 second version (first version was silver-only with a red rOtring logo text) [M1][M2][K10].",
+   note_ja:"リングなしは Tikky Special の標準形態：1983/84 発売当初から 1996 年ホワイトセットでの全面赤リング化まで、ほとんどリングなし。範囲が広すぎて年代判定には使えないため参考のみ。Tikky automatic LS の赤リング開始は見解が分かれる：rOtring Museum は 1988 年から、Heath スレッドは 1990 年第二版から（初版はシルバー軸＋赤 rOtring ロゴ文字のみ）[M1][M2][K10]。"}
+];
+
+/* ================= 状态与渲染 ================= */
+/* 统一集中所有用户可见的判定文案，避免散落各处造成口径不一致 */
+var UI = {
+  EMPTY: "先选择型号，页面会即时给出生产年代区间。",
+  EMPTY_en: "Select a model first; the page will show the production date range.",
+  EMPTY_ja: "まずモデルを選択してください。製造年代の範囲を表示します。",
+  KICKER: "鉴定结果 · 生产年代区间",
+  KICKER_en: "RESULT · PRODUCTION RANGE",
+  KICKER_ja: "判定結果 · 製造年代",
+  CONFLICT_HEAD: "依据矛盾",
+  CONFLICT_HEAD_en: "CONFLICT",
+  CONFLICT_HEAD_ja: "矛盾",
+  NODATA: "暂无可靠资料",
+  NODATA_en: "NO RELIABLE DATA",
+  NODATA_ja: "信頼できる資料なし",
+  VARIANTS: "口径分歧",
+  VARIANTS_en: "Variant opinions",
+  VARIANTS_ja: "口径の相違",
+  SINGLE: "单一依据",
+  SINGLE_en: "Single source",
+  SINGLE_ja: "単一の根拠",
+  SOURCE_JOIN: " 交叉 ",
+  SOURCE_JOIN_en: " × ",
+  SOURCE_JOIN_ja: " × ",
+  REFONLY: "参考",
+  REFONLY_en: "Ref.",
+  REFONLY_ja: "参考",
+  TO_PRESENT: "至今",
+  TO_PRESENT_en: "to present",
+  TO_PRESENT_ja: "現在まで",
+  OPEN_LO: "约 ",
+  OPEN_LO_en: "c. ",
+  OPEN_LO_ja: "約 ",
+  OPEN_HI: " 之前",
+  OPEN_HI_en: " before",
+  OPEN_HI_ja: " 以前",
+
+  /* header 与 hero */
+  TITLE: "rOtring Tikky 交叉断代",
+  TITLE_en: "rOtring Tikky Cross-Dating",
+  TITLE_ja: "rOtring Tikky クロス年代判定",
+  SUBTITLE: "按型号、配色、刻印、帽顶等特征，交叉核对生产年代与真伪",
+  SUBTITLE_en: "Cross-check production era and authenticity via model, color, imprint, cap shape, etc.",
+  SUBTITLE_ja: "モデル・配色・刻印・キャップ形状などから製造年代と真贋を突き合わせる",
+  HERO_TITLE: "逐项选择特征，交叉核对年代、型号与真伪",
+  HERO_TITLE_en: "Select features item by item to cross-check era, model and authenticity",
+  HERO_TITLE_ja: "特徴を一つずつ選び、年代・モデル・真贋を照合する",
+  HERO_P: "页面数据全部来自可追溯来源：rOtring 官方品牌史、Knockology 收藏论坛多帖（主帖、automatics 年表帖、目录帖、short history 帖等，转述 rOtring Museum 管理员 Dux 口述与目录实物）、「文具病」与 bungu-talk 目录、1996 年官方目录。不同来源口径不一致时，页面并列展示「口径分歧」；没有任何年代记载的组合，会标注「暂无可靠资料」，不猜测。",
+  HERO_P_en: "All data on this page comes from traceable sources: rOtring official brand history, multiple Knockology forum threads (main thread, automatics timeline, catalogs, short history — relaying rOtring Museum curator Dux's engineer statements and catalog items), Stationeria and bungu-talk blogs, and the 1996 official catalog. When sources disagree, all opinions are shown side by side; combinations with no date record are marked \"No reliable data\" — no guessing.",
+  HERO_P_ja: "このページのデータはすべて追跡可能な出典に基づく：rOtring 公式ブランド史、Knockology フォーラムの複数スレッド（メインスレッド、automatics 年表、カタログ、short history など。rOtring Museum 管理人 Dux の技術者談話と実物カタログを転載）、「文具病」と「ブングトーク」のブログ、1996 年公式カタログ。出典によって口径が異なる場合は並列表示する。年代記録のない組み合わせは「信頼できる資料なし」と表示し、推測しない。",
+
+  /* 步骤 */
+  S_MODEL: "型号",
+  S_MODEL_en: "Model",
+  S_MODEL_ja: "モデル",
+  S_MODEL_SUB: "先定型号，这是最优先的依据；页面聚焦第一代（1979–1998 世代）",
+  S_MODEL_SUB_en: "Start with the model — the highest-priority clue; this page focuses on the 1st generation (1979–1998 era)",
+  S_MODEL_SUB_ja: "まずモデルを決める。最優先の手がかり。このページは初代（1979–1998 世代）に焦点を当てる",
+  S_COLOR: "笔杆颜色",
+  S_COLOR_en: "Barrel color",
+  S_COLOR_ja: "軸の色",
+  S_COLOR_SUB: "纯色不单独决定年代（含标志性酒红 Burgundy）；透明仅 Tikky II 可选；大理石配色有专属备注",
+  S_COLOR_SUB_en: "Solid colors alone don't date a pen (incl. the signature burgundy); clear is only selectable for Tikky II; marble has dedicated notes",
+  S_COLOR_SUB_ja: "無地色だけでは年代を決められない（象徴色ワイン含む）。透明は Tikky II のみ選択可。マーブルには専用の注記あり",
+  S_BARREL: "笔杆刻印",
+  S_BARREL_en: "Barrel imprint",
+  S_BARREL_ja: "軸の刻印",
+  S_BARREL_SUB: "可多选；笔杆印刷通常不含产地字样，产地信息在笔夹",
+  S_BARREL_SUB_en: "Multi-select; barrel printing usually has no country mark — country info is on the clip",
+  S_BARREL_SUB_ja: "複数選択可。軸の印刷には通常、産地表記はない。産地はクリップにある",
+  S_CLIP: "笔夹刻印",
+  S_CLIP_en: "Clip imprint",
+  S_CLIP_ja: "クリップの刻印",
+  S_CLIP_SUB: "可多选；同一支笔通常只有一个刻字，多选用于不确定时对照。年代随结果区上方的口径切换",
+  S_CLIP_SUB_en: "Multi-select; a pen normally has only one clip marking. Selecting several is for cross-checking when unsure. Dating follows the theory switch above the result area",
+  S_CLIP_SUB_ja: "複数選択可。通常は刻印はひとつだけ。迷ったときの照合用に複数選択を許す。年代は結果欄上の口径切り替えに従う",
+  S_RING: "杆身环（进阶）",
+  S_RING_en: "Barrel ring (advanced)",
+  S_RING_ja: "軸のリング（上級）",
+  S_RING_SUB: "笔杆中段色环，可选可不选；仅少数型号有环的年份记载",
+  S_RING_SUB_en: "Optional color ring on the barrel; only a few models have documented ring years",
+  S_RING_SUB_ja: "軸中段のカラーリング。選択は任意。リングの年代記録があるのは一部モデルのみ",
+  S_MARKING: "笔径（芯径）",
+  S_MARKING_en: "Lead size",
+  S_MARKING_ja: "芯径",
+  S_MARKING_SUB: "杆上印的具体毫米数——被低估的硬年代指标：0.3/0.9 是第一代，0.35/1.0 是 1996 年后",
+  S_MARKING_SUB_en: "The mm number printed on the barrel — an underrated hard dating clue: 0.3/0.9 = 1st gen, 0.35/1.0 = post-1996",
+  S_MARKING_SUB_ja: "軸に印字された mm 数。見落とされがちな強い年代指標：0.3/0.9 は初代、0.35/1.0 は 1996 年以降",
+  S_SLEEVE: "护芯管类型（进阶）",
+  S_SLEEVE_en: "Lead sleeve (advanced)",
+  S_SLEEVE_ja: "パイプタイプ（上級）",
+  S_SLEEVE_SUB: "固定 / 半滑动 / 全滑动 / 双敲 / 锥形——这是识别「型号是不是认错了」的硬证据",
+  S_SLEEVE_SUB_en: "Fixed / half-slide / full-slide / double-push / conical — hard evidence for checking whether the model was misidentified",
+  S_SLEEVE_SUB_ja: "固定 / 半スライド / 全スライド / ダブルプッシュ / コニカル——モデルの誤認を見抜く強力な証拠",
+  S_CAP: "帽顶形状（观察 + 文字证据）",
+  S_CAP_en: "Cap top shape (observation + textual evidence)",
+  S_CAP_ja: "キャップ先端の形状（観察＋文献）",
+  S_CAP_SUB: "金属圆头 / 金属平头 / 金属头带塑料圆顶 / 金属头镂空——塑料圆顶有日文记载，圆头有藏家描述，其余为收藏圈观察",
+  S_CAP_SUB_en: "Metal dome / metal flat / metal with plastic dome / metal with cutout — the plastic dome has Japanese documentation, dome has collector description, others are collector observations",
+  S_CAP_SUB_ja: "金属ドーム / 金属フラット / 金属＋樹脂ドーム / 金属中空——樹脂ドームは日本語文献、ドームはコレクターの記述、その他はコレクター観察",
+  RESET: "重置全部选择",
+  RESET_en: "Reset all",
+  RESET_ja: "全選択をリセット",
+  TOGGLE_OPEN: "展开全部型号（原型期 / GT / S / Standard / 400 / Esprit / 二代 / 三代 / 其他少见款）",
+  TOGGLE_OPEN_en: "Show all models (proto / GT / S / Standard / 400 / Esprit / gen2 / gen3 / others)",
+  TOGGLE_OPEN_ja: "全モデルを表示（プロト / GT / S / Standard / 400 / Esprit / 2代目 / 3代目 / その他）",
+  TOGGLE_CLOSE: "收起全部型号",
+  TOGGLE_CLOSE_en: "Collapse all models",
+  TOGGLE_CLOSE_ja: "全モデルを折りたたむ",
+
+  /* 结果区辅助文案 */
+  THEORY_NOTE: "当前口径 {t}：Germany {g}；W. Germany {w}。切换口径会同时改变对照表与判定结果。",
+  THEORY_NOTE_en: "Current theory {t}: Germany {g}; W. Germany {w}. Switching theories updates the reference table and the result.",
+  THEORY_NOTE_ja: "現在の口径 {t}：Germany {g}；W. Germany {w}。口径を切り替えると対照表と判定結果が同時に変わります。",
+  MODEL_ROW: "型号", MODEL_ROW_en: "Model", MODEL_ROW_ja: "モデル",
+  MODEL_NOTE_ROW: "型号备注", MODEL_NOTE_ROW_en: "Model notes", MODEL_NOTE_ROW_ja: "モデル注記",
+  COLOR_ROW: "颜色", COLOR_ROW_en: "Color", COLOR_ROW_ja: "色",
+  COLOR_NOTE_ROW: "颜色备注", COLOR_NOTE_ROW_en: "Color notes", COLOR_NOTE_ROW_ja: "色の注記",
+  BARREL_ROW: "笔杆刻印", BARREL_ROW_en: "Barrel imprint", BARREL_ROW_ja: "軸の刻印",
+  RING_ROW: "杆身环", RING_ROW_en: "Barrel ring", RING_ROW_ja: "軸のリング",
+  MARKING_ROW: "笔径", MARKING_ROW_en: "Lead size", MARKING_ROW_ja: "芯径",
+  SLEEVE_ROW: "护芯管", SLEEVE_ROW_en: "Lead sleeve", SLEEVE_ROW_ja: "パイプ",
+  CAP_ROW: "帽顶形状", CAP_ROW_en: "Cap top", CAP_ROW_ja: "キャップ先端",
+  CLIP_ROW: "笔夹刻印", CLIP_ROW_en: "Clip imprint", CLIP_ROW_ja: "クリップの刻印",
+  NO_MODEL: "未选择", NO_MODEL_en: "Not selected", NO_MODEL_ja: "未選択",
+  CONFLICT_LINE: "这些依据互相矛盾，无法合并出区间：", CONFLICT_LINE_en: "These clues contradict each other and cannot merge into a range:", CONFLICT_LINE_ja: "これらの根拠は互いに矛盾し、区間を統合できません：",
+  CONFLICT_CMD: "判断命令：以实物为准重新核对型号与笔夹/笔杆刻字；若确认无误，说明这支笔落在两套口径的缝隙里（如晚期的 Special、改版过渡期），页面没有可靠数据可给，不做猜测。",
+  CONFLICT_CMD_en: "Action: recheck the model and clip/barrel imprints against the actual pen; if confirmed, this pen falls in the gap between two theories (e.g. late Special, transition period). The page has no reliable data for it and does not guess.",
+  CONFLICT_CMD_ja: "対処：実物でモデルとクリップ・軸の刻印を再確認。確認できた場合、このペンは二口径の隙間（後期 Special、改版移行期など）に落ちる。ページには信頼できるデータがなく、推測しない。",
+  REF_HEAD: "不参与交叉、只作参考的依据：", REF_HEAD_en: "Reference only (not cross-dated):", REF_HEAD_ja: "クロス対象外・参考のみの根拠：",
+  WARN_ONE: "当前只有一个可交叉的依据（{x}），结果等于该依据本身的区间。继续勾选其他特征才能收窄。",
+  WARN_ONE_en: "Only one crossable clue now ({x}), so the result equals that clue's own range. Select more features to narrow it.",
+  WARN_ONE_ja: "現在クロスできる根拠は一つ（{x}）だけで、結果はその根拠自体の区間と同じ。他の特徴を選ぶと絞り込めます。",
+  WARN_SPAN: "这个型号的生产跨度较长。请继续勾选「笔夹刻印」，页面会用刻字年代交叉收窄范围。",
+  WARN_SPAN_en: "This model has a long production span. Select the clip imprint too — the page will cross-narrow with the marking years.",
+  WARN_SPAN_ja: "このモデルは生産期間が長い。「クリップの刻印」も選択してください。刻印の年代とクロスして範囲を絞り込みます。",
+  WARN_NOFEAT: "当前只勾选了没有可靠年代记载的特征，页面不猜测。请补充型号或带年代记载的刻印。",
+  WARN_NOFEAT_en: "Only features without reliable dating are selected; the page does not guess. Add a model or a dated imprint.",
+  WARN_NOFEAT_ja: "信頼できる年代記録のない特徴だけが選択されています。ページは推測しません。モデルか年代記録のある刻印を追加してください。",
+  MULTI_CLIP: "你勾选了多个笔夹刻印。同一支笔只有一个刻字；勾选多个时页面不做交叉，大字显示的是型号区间。只保留一个（以实物为准），页面才会给出交叉收窄的区间。",
+  MULTI_CLIP_en: "Multiple clip imprints selected. A pen has only one marking; with several selected the page skips cross-dating and shows the model range. Keep one (per the actual pen) to get a cross-narrowed range.",
+  MULTI_CLIP_ja: "クリップ刻印を複数選択しました。一本のペンに刻印は一つだけ。複数選択時はクロスせず、大文字はモデル区間を表示します。一つだけ（実物に基づき）選ぶと、クロスで絞り込んだ区間を表示します。",
+  NO_CROSS_EXTRA: "此条为家族完整性参考（多机能笔），不参与年代交叉断代。",
+  NO_CROSS_EXTRA_en: "Listed for family completeness (multi-function pen); excluded from dating cross-checks.",
+  NO_CROSS_EXTRA_ja: "ファミリー全体の参考として記載（多機能ペン）。年代クロス対象外。",
+  REF_COLOR_NODATA: "这个配色没有年代记载，只能证明存在，不能用来收窄范围。",
+  REF_COLOR_NODATA_en: "This colorway has no dating record — it only proves existence, can't narrow the range.",
+  REF_COLOR_NODATA_ja: "この配色には年代記録がない。存在を証明するだけで、範囲の絞り込みには使えない。",
+  REF_BARREL_NODATA: "这种刻印没有可靠年代边界，只作参考，不参与交叉。",
+  REF_BARREL_NODATA_en: "This imprint has no reliable date bounds — reference only, not cross-dated.",
+  REF_BARREL_NODATA_ja: "この刻印には信頼できる年代境界がない。参考のみ、クロス対象外。",
+  REF_RING_NODATA: "环色与年代的对应关系没有系统记载，只作参考。",
+  REF_RING_NODATA_en: "No systematic record links ring color to year — reference only.",
+  REF_RING_NODATA_ja: "リング色と年代の対応に体系的な記録がない。参考のみ。",
+  REF_CLIP_NODATA: "没有可靠的年代边界，只作参考。",
+  REF_CLIP_NODATA_en: "No reliable date bounds — reference only.",
+  REF_CLIP_NODATA_ja: "信頼できる年代境界がない。参考のみ。",
+  FMT_EARLIER: "更早", FMT_EARLIER_en: "earlier", FMT_EARLIER_ja: "それ以前",
+  SRC_LABEL: "标注规则：共 {n} 项来源，编号 {keys}。页面正文中的 [O1] [K1] 等编号对应下方链接；同一型号有多来源时，页面并列展示各口径而不合并。",
+  SRC_LABEL_en: "Legend: {n} sources total, keys {keys}. Bracketed IDs like [O1] [K1] in the text map to the links below; when a model has several sources, the page shows the theories side by side without merging.",
+  SRC_LABEL_ja: "凡例：計 {n} 出典、キー {keys}。本文中の [O1] [K1] などの番号は下のリンクに対応。同一モデルに複数の出典がある場合、ページは各口径を併合せず並列表示する。",
+  META: "资料核对至 {date} · {n} 项来源", META_en: "Data verified to {date} · {n} sources", META_ja: "資料確認 {date} まで · 全 {n} 出典",
+  FOOTER: "红环 Tikky 交叉断代 · 数据为收藏圈整理口径 · 仅供爱好者参考",
+  FOOTER_en: "rOtring Tikky Cross-Dating · data compiled from collector sources · for enthusiast reference only",
+  FOOTER_ja: "rOtring Tikky クロス年代判定 · データはコレクター界隈の整理口径 · 愛好家向け参考資料",
+
+  /* 笔夹对照表 */
+  CLIP_TABLE_T: "笔夹刻字对照表",
+  CLIP_TABLE_T_en: "Clip Imprint Reference",
+  CLIP_TABLE_T_ja: "クリップ刻印 対照表",
+  CLIP_TABLE_S: "笔夹刻字有<b>三套并存口径</b>，差异很大（W. Germany 的结束年从 1990 到 1995 相差五年）。下表随上方切换实时变化；三套口径的共识只有两点：W. Germany ⇒ 1995 年之前，Germany ⇒ 1990 年之后。",
+  CLIP_TABLE_S_en: "Clip imprints follow <b>three coexisting theories</b> that differ widely (the end of W. Germany ranges from 1990 to 1995). The table updates live with the switch above; the only consensus: W. Germany ⇒ before 1995, Germany ⇒ after 1990.",
+  CLIP_TABLE_S_ja: "クリップ刻印には<b>三つの口径が併存</b>し、差が大きい（W. Germany の終了年は 1990 から 1995 まで五年の開き）。下表は上部の切り替えでリアルタイムに更新。三口径の共通認識は二点のみ：W. Germany ⇒ 1995 年以前、Germany ⇒ 1990 年以降。",
+  THEORY_NOTE_STATIC: "口径说明加载中…",
+  THEORY_NOTE_STATIC_en: "Loading theory notes…",
+  THEORY_NOTE_STATIC_ja: "口径の説明を読み込み中…",
+  THEORY_SRC: "口径来源：<b>B</b> = Knockology 主帖转述 rOtring Museum（Dux）工程师口述 + 作者实物核对，作者称「可能更接近现实」；<b>A</b> = 行业普遍规律（1990 两德统一后切换）；<b>C</b> = 日本收藏博客（2009 年实测，W.Germany ⇒ 1990 年 10 月以前）。三套口径的共识只有两点：W. Germany ⇒ 1995 年之前，Germany ⇒ 1990 年之后。",
+  THEORY_SRC_en: "Theory sources: <b>B</b> = Knockology thread relaying rOtring Museum (Dux) engineer statements + author's physical verification, author says \"probably closer to reality\"; <b>A</b> = general industry rule (switch after 1990 reunification); <b>C</b> = Japanese collector blog (2009 test: W.Germany ⇒ before Oct 1990). Consensus: W. Germany ⇒ before 1995, Germany ⇒ after 1990.",
+  THEORY_SRC_ja: "口径の出典：<b>B</b> = Knockology スレッドによる rOtring Museum（Dux）技術者の談話＋作者の実物照合、作者は「現実に近い可能性が高い」と述べる；<b>A</b> = 業界の通則（1990 年ドイツ再統一後に切替）；<b>C</b> = 日本の収集ブログ（2009 年実測、W.Germany ⇒ 1990 年 10 月以前）。三口径の共通認識は二点のみ：W. Germany ⇒ 1995 年以前、Germany ⇒ 1990 年以降。",
+  REF_T: "笔尖横纹 / 内部塑料色 / 印字颜色 对照",
+  REF_T_en: "Tip Ridges / Inner Plastic Color / Imprint Color Reference",
+  REF_T_ja: "ペン先の横線 / 内部プラスチック色 / 印字色 対照表",
+  REF_S: "不用拆笔，靠笔尖横纹就能读出真实笔径；内部塑料色要拆开才看得到。来源：rOtring Museum 大理石条目与 1989 白色套装、文具病 079。",
+  REF_S_en: "No disassembly needed: tip ridges reveal the true lead size; inner plastic color requires opening the pen. Sources: rOtring Museum marble entry, 1989 white set, Stationeria 079.",
+  REF_S_ja: "分解不要：ペン先の横線で本当の芯径が分かる。内部プラスチック色は分解が必要。出典：rOtring Museum のマーブル項目、1989 年ホワイトセット、文具病 079。",
+  TH_SIZE: "笔径", TH_SIZE_en: "Lead size", TH_SIZE_ja: "芯径",
+  TH_RIDGES: "笔尖横纹数", TH_RIDGES_en: "Tip ridges", TH_RIDGES_ja: "ペン先横線",
+  TH_PLASTIC: "内部塑料色", TH_PLASTIC_en: "Inner plastic", TH_PLASTIC_ja: "内部プラスチック",
+  TH_INK: "早期印字颜色", TH_INK_en: "Early imprint color", TH_INK_ja: "初期印字色",
+  TH_ANCHOR: "年代锚点", TH_ANCHOR_en: "Dating anchor", TH_ANCHOR_ja: "年代の目安",
+  RED: "红", RED_en: "Red", RED_ja: "赤",
+  BLACK: "黑", BLACK_en: "Black", BLACK_ja: "黒",
+  BLUE: "蓝", BLUE_en: "Blue", BLUE_ja: "青",
+  TRANSPARENT: "透明", TRANSPARENT_en: "Clear", TRANSPARENT_ja: "透明",
+  NR: "未记载", NR_en: "Not recorded", NR_ja: "記載なし",
+  Y_0_3: "0.3 为黄字（文具病单源）", Y_0_3_en: "0.3 = yellow imprint (single source: Stationeria)", Y_0_3_ja: "0.3 は黄字（文具病のみ）",
+  O_0_9: "0.9 为橙字（文具病单源）", O_0_9_en: "0.9 = orange imprint (single source: Stationeria)", O_0_9_ja: "0.9 は橙字（文具病のみ）",
+  A_0_3: "0.3=1996 前；0.35=1996 后", A_0_3_en: "0.3 = before 1996; 0.35 = after 1996", A_0_3_ja: "0.3=1996 以前；0.35=1996 以降",
+  A_0_9: "0.9=仅第一代（早期德系标）；1.0=1996 白色套装起（一代大理石亦有 1.0）", A_0_9_en: "0.9 = 1st gen only (early German mark); 1.0 = from 1996 white set (1st-gen marble has 1.0 too)", A_0_9_ja: "0.9=初代のみ（初期ドイツ表記）；1.0=1996 ホワイトセット以降（初代マーブルにも 1.0 あり）",
+  NO_RIDGE: "无横纹", NO_RIDGE_en: "None", NO_RIDGE_ja: "なし",
+  ALL_SERIES: "贯穿全系", ALL_SERIES_en: "All series", ALL_SERIES_ja: "全シリーズ",
+  NOTES_T: "说明与边界", NOTES_T_en: "Notes & Boundaries", NOTES_T_ja: "説明と限界",
+  SRC_T: "参考来源", SRC_T_en: "References", SRC_T_ja: "参考文献",
+  SRC_REL: "注意：K1（Knockology 主帖）与 V1（YouTube 视频）出自同一作者——论坛用户 Pdunc67（即频道主 Patrick，Great Mechanical Pencils）。K1 是帖子形式、主要转述 rOtring Museum 管理员 Dux 提供的工程师口述；V1 是视频形式、是该作者本人作为收藏家的口径。两处言论同源同人，页面仍并列展示，便于你对照其帖子与视频表述是否一致。此外页面还并入了与 Patrick 无直接关联的独立来源：Heath 整理的《rOtring automatics》年表帖（K10，引用 rOtring Museum 档案与美/瑞目录）、rOtring Museum 管理员 Dux 本人对 GT 与 aqua green 交叉点的确认（K9、K1 第 2 页）等，构成多口径对照。",
+  SRC_REL_en: "Note: K1 (Knockology main thread) and V1 (YouTube video) share the same author — forum user Pdunc67 (aka channel host Patrick, Great Mechanical Pencils). K1 is a thread relaying rOtring Museum curator Dux's engineer statements; V1 is a video giving Patrick's own collector view. Both are shown side by side so you can compare. Independent sources are also included: Heath's automatics timeline (K10), and Dux's own confirmations (K9, K1 p.2).",
+  SRC_REL_ja: "注意：K1（Knockology メインスレッド）と V1（YouTube 動画）は同一の作者——フォーラムユーザー Pdunc67（＝チャンネル主催者 Patrick、Great Mechanical Pencils）。K1 は rOtring Museum 管理人 Dux の技術者談話を転載したスレッド、V1 は作者本人のコレクター視点の動画。両者を並列表示して比較できるようにしている。Patrick と無関係の独立出典（Heath の automatics 年表 K10、Dux 自身の確認 K9 等）も併載している。"
+};
+
+var state = {model:null, color:null, barrel:[], clip:[], ring:null, marking:null, sleeve:null, cap:null, theory:"B"};
+
+function el(tag, cls, text){
+  var n=document.createElement(tag);
+  if(cls) n.className=cls;
+  if(text!==undefined) n.textContent=text;
+  return n;
+}
+
+function buildChips(containerId, list, key, multi){
+  var box=document.getElementById(containerId);
+  box.innerHTML="";
+  list.forEach(function(item){
+    var b=el("button","chip",langField(item,"name"));
+    b.type="button";
+    b.setAttribute("aria-pressed","false");
+    b.dataset.id=item.id;
+    b.addEventListener("click",function(){
+      if(multi){
+        var arr=state[key];
+        var i=arr.indexOf(item.id);
+        if(i>=0){ arr.splice(i,1); } else { arr.push(item.id); }
+      } else {
+        if(state[key]===item.id){ state[key]=null; }
+        else { state[key]=item.id; }
+      }
+      // 切换型号时，若已选颜色不在该型号配色内，自动清空
+      if(key==="model"){
+        var m0=getModel();
+        if(m0){
+          if(state.color){
+            var c0=COLORS.filter(function(x){return x.id===state.color;})[0];
+            if(c0 && colorBlockedByModel(m0, state.color, c0.group)){ state.color=null; }
+          }
+          state.barrel = state.barrel.filter(function(bid){
+            return !barrelIncompatible(m0.id, bid);
+          });
+        }
+      }
+      syncChips(); renderResult();
+    });
+    box.appendChild(b);
+  });
+}
+function buildChipsAll(){
+  ["model","color","barrel","clip","ring","marking","sleeve","cap"].forEach(function(key){
+    var boxes;
+    if(key==="model"){
+      boxes=[document.getElementById("chips-model"), document.getElementById("chips-model-rare")].filter(Boolean);
+    } else {
+      var b0=document.getElementById("chips-"+key);
+      boxes=b0?[b0]:[];
+    }
+    boxes.forEach(function(box){
+      // 重建为当前语言；model 分常见（外面）/少见（折叠）两个容器，与初始加载口径一致
+      var list;
+      if(key==="model" && typeof COMMON_MODELS!=="undefined" && COMMON_MODELS){
+        list = (box.id==="chips-model")
+          ? ALL_MODELS.filter(function(m){return COMMON_MODELS.indexOf(m.id)>=0;})
+          : ALL_MODELS.filter(function(m){return COMMON_MODELS.indexOf(m.id)<0;});
+      } else {
+        list=getList(key);
+      }
+      var isMulti=(key==="barrel"||key==="clip");
+      var singleBox = box.parentNode; // 记录外层容器
+      // 直接重建 chips 容器
+      var holder = box; // chips div 本身
+      holder.innerHTML="";
+      list.forEach(function(item){
+        var b=el("button","chip",langField(item,"name"));
+        b.type="button";
+        b.setAttribute("aria-pressed","false");
+        b.dataset.id=item.id;
+        b.addEventListener("click",function(){
+          if(isMulti){
+            var arr=state[key];
+            var i=arr.indexOf(item.id);
+            if(i>=0){ arr.splice(i,1); } else { arr.push(item.id); }
+          } else {
+            if(state[key]===item.id){ state[key]=null; } else { state[key]=item.id; }
+          }
+          if(key==="model"){
+            var m0=getModel();
+            if(m0){
+              if(state.color){
+                var c0=COLORS.filter(function(x){return x.id===state.color;})[0];
+                if(c0 && colorBlockedByModel(m0, state.color, c0.group)){ state.color=null; }
+              }
+              state.barrel = state.barrel.filter(function(bid){ return !barrelIncompatible(m0.id, bid); });
+            }
+          }
+          syncChips(); renderResult();
+        });
+        holder.appendChild(b);
+      });
+    });
+  });
+}
+
+function getList(key){
+  if(key==="model") return MODELS.concat(EXTRA_MODELS);
+  if(key==="color") return COLORS;
+  if(key==="barrel") return BARRELS;
+  if(key==="marking") return MARKINGS;
+  if(key==="sleeve") return SLEEVES;
+  if(key==="ring") return RINGS;
+  return CLIPS;
+}
+/* 笔夹项 + 当前口径的年代规则，合并成一条可渲染/可计算的记录 */
+function clipInfo(c){
+  var r = clipRule(c.id);
+  var y = r.years;
+  if(LANG==="en" && r.years_en!==undefined) y=r.years_en;
+  if(LANG==="ja" && r.years_ja!==undefined) y=r.years_ja;
+  return {id:c.id, name:langField(c,"name"), note:langField(c,"note"), src:c.src,
+          lo:(r.lo===undefined?null:r.lo), hi:(r.hi===undefined?null:r.hi),
+          noCap:!!r.noCap, years:y||"—"};
+}
+
+function colorBlockedByModel(m, colorId, group){
+  if(!m) return false;
+  var c=COLORS.filter(function(x){return x.id===colorId;})[0];
+  if(!c) return false;
+  if(colorId==="clear"){ return m.id!=="tikky2"; }
+  if(m.colorAllow){ return m.colorAllow.indexOf(colorId)<0; }
+  if(m.noMarble && group==="marble") return true;
+  if(c.specialOnly && m.id!=="special" && m.id!=="retro") return true;
+  if(c.noScript && state.barrel.indexOf("script_tikky")>=0) return true;
+  return false;
+}
+
+/* 型号 × 笔杆刻印 互斥判定：命中则组合不可能，直接判矛盾 */
+function barrelIncompatible(modelId, barrelId){
+  var allow = BARREL_MODEL_COMPAT[modelId];
+  if(!allow) return false;              // null/未定义 = 该型号无互斥约束
+  return allow.indexOf(barrelId) < 0;
+}
+
+function syncChips(){
+  var m=getModel();
+  ["model","color","barrel","clip","ring","marking","sleeve","cap"].forEach(function(key){
+    // model 分了常见/少见两个容器，都要同步
+    var boxes;
+    if(key==="model"){
+      boxes=[document.getElementById("chips-model"), document.getElementById("chips-model-rare")].filter(Boolean);
+    } else {
+      var b0=document.getElementById("chips-"+key);
+      boxes=b0?[b0]:[];
+    }
+    var list=getList(key);
+    var isMulti = (key==="barrel"||key==="clip");
+    boxes.forEach(function(box){
+      Array.prototype.forEach.call(box.children,function(b){
+        var id=b.dataset.id;
+        var it=list.filter(function(x){return x.id===id;})[0];
+        var on = isMulti ? (state[key].indexOf(id)>=0) : (id===state[key]);
+        b.setAttribute("aria-pressed", on?"true":"false");
+        b.classList.remove("is-warn");
+        if(on && it && it.warn) b.classList.add("is-warn");
+        // 颜色联动：型号确定后，该型号没有的配色禁用
+        if(key==="color"){
+          var blocked=colorBlockedByModel(m, id, it?it.group:null);
+          b.disabled=blocked;
+          b.classList.toggle("is-disabled", blocked);
+          b.setAttribute("aria-disabled", blocked?"true":"false");
+        } else {
+          b.disabled=false;
+          b.classList.remove("is-disabled");
+        }
+      });
+    });
+  });
+  // 口径按钮高亮
+  var bar=document.getElementById("theory-bar");
+  if(bar){
+    Array.prototype.forEach.call(bar.children,function(b){
+      b.setAttribute("aria-pressed", b.getAttribute("data-theory")===state.theory ? "true":"false");
+    });
+  }
+}
+
+function srcText(keys){
+  if(!keys) return "";
+  return keys.split(/[;；]\s*/).map(function(k){return "["+k+"]";}).join(" ");
+}
+
+function getModel(){ return MODELS.concat(EXTRA_MODELS).filter(function(m){return m.id===state.model;})[0]||null; }
+function getColor(){ return COLORS.filter(function(c){return c.id===state.color;})[0]||null; }
+function getBarrels(){ return (state.barrel||[]).map(function(id){ return BARRELS.filter(function(b){return b.id===id;})[0]; }).filter(Boolean); }
+function getClips(){ return (state.clip||[]).map(function(id){ return CLIPS.filter(function(c){return c.id===id;})[0]; }).filter(Boolean); }
+function getRing(){ return RINGS.filter(function(r){return r.id===state.ring;})[0]||null; }
+function getSleeve(){ return SLEEVES.filter(function(x){return x.id===state.sleeve;})[0]||null; }
+function getMarking(){ return MARKINGS.filter(function(x){return x.id===state.marking;})[0]||null; }
+
+/* 颜色给出的年代锚点；null = 该配色没有可用的年代记载 */
+function colorAnchor(co){
+  if(!co) return null;
+  // 文具病 055/059：大理石为 1990's；粉大理石另有 early 1990s 记载，均属 1990 年代量级
+  if(co.id==="marble" || co.id==="marble_rainbow")
+    return {lo:1990, hi:1999, noCap:false,
+            label:(co.id==="marble"
+              ? T("大理石（1990's，[N3]）","Marble (1990s, [N3])","マーブル（1990年代、[N3]）")
+              : T("彩虹大理石（1990's，稀有，[N3][K5]）","Rainbow marble (1990s, rare, [N3][K5])","レインボーマーブル（1990年代、希少、[N3][K5]）"))};
+  if(co.noRecord) return null;
+  return null;
+}
+
+function fmtYear(n){ return n===null?T("至今","present","現在"):String(n); }
+function fmtSpan(lo, hi, noCap){
+  var a = (lo===null) ? T("更早","earlier","それ以前") : String(lo);
+  var b = (hi===null) ? T(UI.TO_PRESENT, UI.TO_PRESENT_en, UI.TO_PRESENT_ja) : (String(hi) + (noCap?T("（仅参考）"," (ref. only)","（参考のみ）"):""));
+  return a + " – " + b;
+}
+/* 从数据项构造一个可参与交叉的年代跨度 */
+function spanOf(item, label, kind){
+  return {kind:kind||"", label:label, lo:(item.lo===undefined?null:item.lo),
+          hi:(item.hi===undefined?null:item.hi), noCap:!!item.noCap};
+}
+
+function renderResult(){
+  var body=document.getElementById("result-body");
+  var m=getModel(), co=getColor(), barrels=getBarrels(), clips=getClips(), ring=getRing(), mk=getMarking();
+
+  // 型号切换后，被禁用的颜色自动清空
+  if(m && state.color){
+    var c0=COLORS.filter(function(x){return x.id===state.color;})[0];
+    if(c0 && colorBlockedByModel(m, state.color, c0.group)){ state.color=null; co=null; }
+  }
+
+  if(!m && clips.length===0 && barrels.length===0 && !co && !ring && !mk){
+    body.innerHTML="";
+    body.appendChild(el("div","result-empty",UI_T("EMPTY")));
+    return;
+  }
+
+  var kicker=el("div","result-kicker",UI_T("KICKER"));
+  var yearsBox=el("div","result-years","\u2014");
+  var detail=el("div","result-detail");
+  var notes=[];
+  var forcedConflict=null;
+  var note = function(kind,text,extra){
+    var o={kind:kind,text:text};
+    if(extra){ for(var k in extra){ o[k]=extra[k]; } }
+    notes.push(o);
+  };
+  var spans=[];   // 参与交叉的年代跨度
+  var refs=[];    // 只作参考、不参与交叉的依据
+
+  /* ---------- 口径提示（只在勾了笔夹刻印时才显示，避免噪音） ---------- */
+  if(clips.length){
+    var th=THEORY[state.theory]||THEORY.B;
+    var g_y = LANG==="en"?th.clip.germany_clip.years_en:(LANG==="ja"?th.clip.germany_clip.years_ja:th.clip.germany_clip.years);
+    var w_y = LANG==="en"?th.clip.wgermany_clip.years_en:(LANG==="ja"?th.clip.wgermany_clip.years_ja:th.clip.wgermany_clip.years);
+    note("theory",T("当前口径 ","Current theory ","現在の口径 ")+state.theory+"："+g_y+"；W. Germany "+w_y+T("。切换口径会同时改变对照表与判定结果。"," — switching theories updates the reference table and the result.","。口径を切り替えると対照表と判定結果が同時に変わります。"));
+  }
+
+  /* ---------- 型号 ---------- */
+  if(m){
+    addRow(detail,UI_T("MODEL_ROW"), langField(m,"name")+"\u3000"+srcText(m.src));
+    if(m.note){ addRow(detail,UI_T("MODEL_NOTE_ROW"), langField(m,"note")); }
+    if(m.noCross){
+      refs.push({label:T("型号「","Model \"","モデル「")+langField(m,"name")+T("」","\"","」"), text:UI_T("NO_CROSS_EXTRA")});
+    } else {
+      var mYears = LANG==="en"?(m.years_en||m.years):(LANG==="ja"?(m.years_ja||m.years):m.years);
+      spans.push({kind:"model", label:T("型号 ","Model ","モデル ")+langField(m,"name")+"（"+(mYears||"").split("；")[0]+"）",
+                  lo:(m.lo===null?null:m.lo), hi:(m.hi===null?null:m.hi), noCap:false});
+    }
+  } else {
+    addRow(detail,UI_T("MODEL_ROW"),UI_T("NO_MODEL"));
+  }
+
+  /* ---------- 颜色 ---------- */
+  if(co){
+    addRow(detail,UI_T("COLOR_ROW"), langField(co,"name"));
+    if(co.note){ addRow(detail,UI_T("COLOR_NOTE_ROW"), langField(co,"note")); }
+    var anch=colorAnchor(co);
+    if(anch){
+      spans.push({kind:"color", label:anch.label, lo:anch.lo, hi:anch.hi, noCap:!!anch.noCap});
+    } else if(co.noRecord){
+      refs.push({label:T("颜色「","Color \"","色「")+langField(co,"name")+T("」","\"","」"), text:UI_T("REF_COLOR_NODATA")});
+    }
+  }
+
+  /* ---------- 笔杆刻印 ---------- */
+  if(barrels.length){
+    barrels.forEach(function(b){
+      var incompatible = m ? barrelIncompatible(m.id, b.id) : false;
+      addRow(detail,UI_T("BARREL_ROW"), langField(b,"name")+"\u3000"+langField(b,"hint"));
+      if(incompatible){
+        forcedConflict = T("「","\"")+langField(m,"name")+T("」与笔杆刻印「","\" and barrel imprint \"")+langField(b,"name")+T("」不可能同时存在（该型号不产出这种刻印），请以实物为准重新核对。","\" cannot coexist (this model never carried that imprint) — recheck against the actual pen.","」は同時に存在し得ない（このモデルはこの刻印を採用しない）。実物で再確認してください。");
+        spans.push(spanOf(b,T("笔杆刻印「","Barrel imprint \"")+langField(b,"name")+T("」","\""),"barrel"));
+      } else if(b.noCap || (b.lo===null && b.hi===null)){
+        refs.push({label:T("笔杆刻印「","Barrel imprint \"")+langField(b,"name")+T("」","\""), text:UI_T("REF_BARREL_NODATA")});
+      } else {
+        spans.push(spanOf(b,T("笔杆刻印「","Barrel imprint \"")+langField(b,"name")+T("」","\""),"barrel"));
+      }
+    });
+  }
+
+  /* ---------- 杆身环（只作参考，除 automatic 红环有明确记载） ---------- */
+  if(ring){
+    addRow(detail,UI_T("RING_ROW"), langField(ring,"name")+"　"+langField(ring,"note")+"　"+srcText(ring.src||""));
+    var ringModel = m ? m.id : null;
+    if(ring.id==="red_ring" && ringModel==="special"){
+      spans.push({kind:"ring", label:T("杆身环 红环（Special 1996 白色套装起全面红环 [M4]）","Ring: red ring (Special, full red ring from the 1996 white set [M4])","リング 赤リング（Special、1996 年ホワイトセットから全面赤 [M4]）"), lo:1996, hi:null, noCap:false});
+    } else if(ring.id==="size_ring" && ringModel==="special"){
+      spans.push({kind:"ring", label:T("杆身环 芯径分色环（1989 白色套装 [M3]）","Ring: lead-size color ring (1989 white set [M3])","リング 芯径別カラーリング（1989 年ホワイトセット [M3]）"), lo:1989, hi:1990, noCap:false});
+    } else if(ring.id==="no_ring" && ringModel==="special"){
+      // 无环是 Special 的主流形态（1996 白色套装全面红环前基本无环），信息量大面广、不定年，只作参考不参与交叉
+      refs.push({label:T("杆身环「","Ring \"")+langField(ring,"name")+T("」","\""),
+                 text:T("无环是 Tikky Special 的主流形态：1996 年白色套装全面红环之前基本无环（1983/84 首发起即无环），无法用于收紧年代，仅作参考 [M2][M4]。","No ring is the standard form of the Tikky Special: it was mostly ringless from the 1983/84 launch until the full red-ring switch in the 1996 white set, so it cannot narrow the date — reference only [M2][M4].","リングなしは Tikky Special の標準形態：1983/84 発売当初から 1996 年ホワイトセットでの全面赤リング化まで、ほとんどリングなし。年代を絞り込めないため参考のみ [M2][M4]。")});
+    } else if(ring.id==="red_ring" && ringModel==="auto"){
+      spans.push({kind:"ring", label:T("杆身环 红环（Tikky automatic 1987 年起 [K3]）","Ring: red ring (Tikky automatic from 1987 [K3])","リング 赤リング（Tikky automatic 1987 年から [K3]）"), lo:1987, hi:null, noCap:false});
+    } else if(ringModel==="auto_ls" && ring.id==="red_ring"){
+      spans.push({kind:"ring", label:T("杆身环 红环（automatic LS：rOtring Museum 口径 1988 起 / Heath 帖口径 1990 第二版起 [M1][K10]）","Ring: red ring (automatic LS: rOtring Museum 1988 / Heath 1990 2nd ver. [M1][K10])","リング 赤リング（automatic LS：rOtring Museum 口径 1988 から / Heath スレッド口径 1990 第二版から [M1][K10]）"), lo:1988, hi:null, noCap:false});
+    } else if(ringModel==="auto_ls" && ring.id==="no_ring"){
+      spans.push({kind:"ring", label:T("杆身环 无环（automatic LS 首版 1987–1988/1990，仅银杆+红 rOtring logo [M1][K10]）","Ring: no ring (automatic LS first ver. 1987–1988/1990, silver-only with red rOtring logo [M1][K10])","リング なし（automatic LS 初版 1987–1988/1990、シルバー軸＋赤 rOtring ロゴのみ [M1][K10]）"), lo:1987, hi:1990, noCap:false});
+    } else if(ringModel==="dp" && ring.id==="red_ring"){
+      spans.push({kind:"ring", label:T("杆身环 红环（Metallic Double Push 1990 起改红环 [M5]）","Ring: red ring (Metallic Double Push red ring from 1990 [M5])","リング 赤リング（Metallic Double Push 1990 から赤 [M5]）"), lo:1990, hi:1992, noCap:false});
+    } else if(ringModel==="dp" && ring.id==="color_ring"){
+      spans.push({kind:"ring", label:T("杆身环 银环（Metallic Double Push 1985–1989 [M5]）","Ring: silver ring (Metallic Double Push 1985–1989 [M5])","リング 銀リング（Metallic Double Push 1985–1989 [M5]）"), lo:1985, hi:1989, noCap:false});
+    } else {
+      refs.push({label:T("杆身环「","Ring \"")+langField(ring,"name")+T("」","\""), text:UI_T("REF_RING_NODATA")});
+    }
+  }
+
+  /* ---------- 芯径标示法（可交叉） ---------- */
+  if(mk){
+    addRow(detail,UI_T("MARKING_ROW"), langField(mk,"name")+"　"+langField(mk,"years")+"　"+langField(mk,"note")+"　"+srcText(mk.src||""));
+    if(mk.lo!==null || mk.hi!==null){
+      spans.push({kind:"marking", label:T("笔径 ","Lead size ")+langField(mk,"name")+"（"+langField(mk,"years")+"）", lo:mk.lo, hi:mk.hi, noCap:false});
+    }
+  }
+
+  /* ---------- 护芯管类型（型号互斥判定 + rOtring T 组合年代锚点） ---------- */
+  var sl=getSleeve();
+  if(sl){
+    addRow(detail,UI_T("SLEEVE_ROW"), langField(sl,"name")+"　"+langField(sl,"note")+"　"+srcText(sl.src||""));
+    if(m && !m.sleeveUnknown && sleeveIncompatible(m.id, sl.id)){
+      forcedConflict = T("「","\"")+langField(m,"name")+T("」的护芯管不是「","\" does not use the \"")+langField(sl,"name")+T("」——该型号不采用这种机构，请复核型号是否认错（Special 全期是固定 4mm 管）[N6][M2]。","\" sleeve — this model never used that mechanism; recheck the model (the Special is a fixed 4 mm tube throughout) [N6][M2].","」のパイプではない——このモデルはこの機構を採用しない。モデルの誤認を再確認（Special は全期間固定 4mm 管）[N6][M2]。");
+    }
+    // rOtring T × 护芯管的组合年代锚点（视频口径参与计算，bungu-talk 口径并列备注）
+    if(m && m.id==="rt"){
+      if(sl.id==="half"){
+        spans.push({kind:"sleeve", label:T("护芯管 半滑动（早期 T：视频/时间轴口径 1979–1987；bungu-talk 口径至 1984 前）","Sleeve half-slide (early T: video/timeline 1979–1987; bungu-talk until before 1984)","パイプ 半スライド（初期 T：動画/タイムライン口径 1979–1987；bungu-talk 口径 1984 前まで）"),
+                    lo:1979, hi:1987, noCap:false});
+      } else if(sl.id==="fixed"){
+        spans.push({kind:"sleeve", label:T("护芯管 固定 4mm（后期 T：视频/时间轴口径 1987 起、老杆型至 1998；bungu-talk 口径 1984 起）","Sleeve fixed 4mm (late T: video/timeline from 1987, old body to 1998; bungu-talk from 1984)","パイプ 固定 4mm（後期 T：動画/タイムライン口径 1987 から、旧ボディ 1998 まで；bungu-talk 口径 1984 から）"),
+                    lo:1987, hi:1998, noCap:false});
+      }
+    }
+  }
+
+  /* ---------- 帽顶形状（不参与年代计算，仅记录） ---------- */
+  var cp=CAPS.filter(function(x){return x.id===state.cap;})[0];
+  if(cp && cp.id!=="cap_n"){
+    addRow(detail,UI_T("CAP_ROW"), langField(cp,"name")+"　"+langField(cp,"note")+"　"+srcText(cp.src||""));
+    // 硬规则：金属头带塑料圆顶（丸い樹脂）是早期 T 初版 / S / 三硬度套的特征，
+    // 若用户选了 Special 却配这个帽顶，提示型号可能认错。
+    if(m && cp.id==="cap_plastic" && m.id==="special"){
+      forcedConflict = T("「Tikky Special」量产版不标配金属头带塑料圆顶（丸い樹脂）——这种圆树脂帽顶是早期 rOtring T 初版（1980–1984 小豆色轴）、rOtring S、白杆三硬度套的特征 [N6]。请复核：这支配色是否其实是 T/S/三硬度套，或帽顶是否被后配。","Production \"Tikky Special\" does not come standard with a metal top + plastic dome (丸い樹脂) — that round resin cap top marks the early rOtring T first version (1980–1984 bean-red barrel), the rOtring S, and the white 3-hardness set [N6]. Recheck: is this actually a T/S/3-set, or was the cap replaced?","量産「Tikky Special」に金属＋樹脂ドーム（丸い樹脂）は標準装備ではない——この丸い樹脂キャップは初期 rOtring T 初版（1980–1984 小豆色軸）、rOtring S、白軸 3 硬度セットの特徴 [N6]。この配色が実は T/S/3 硬度セットか、キャップが後付けかを再確認してください。");
+    }
+    // 硬规则：金属头镂空是后期版本的特征，一代塑料款（Tikky F / rOtring T / Tikky Special）不标配。
+    if(m && cp.id==="cap_holed" && ["tikky_f","rt","special"].indexOf(m.id)>=0){
+      forcedConflict = T("「","\"")+langField(m,"name")+T("」是一代塑料款，帽顶是实心金属帽（圆头或平头），不标配金属头镂空。金属头镂空是后期版本（Tikky II/III 或更新款）的特征。请复核：帽顶是否被后换件、或这支笔其实不是一代款。","\" is a 1st-gen plastic model with a solid metal cap (dome or flat); a cutout metal top is not standard. The cutout belongs to later versions (Tikky II/III or newer). Recheck: was the cap replaced, or is this not actually a 1st-gen pen?","」は初代プラモデルで、キャップは中実の金属（ドームまたはフラット）。金属中空は標準装備ではない。中空は後期バージョン（Tikky II/III 以降）の特徴。キャップが後付けか、実物が初代でないかを再確認してください。");
+    }
+  }
+
+  /* ---------- 笔夹刻印 ---------- */
+  if(clips.length){
+    clips.forEach(function(c){
+      var info=clipInfo(c);
+      addRow(detail,UI_T("CLIP_ROW"), T("若为「","If \"")+info.name+T("」→ ","\" → ")+info.years+"\u3000"+srcText(info.src)+"\u3000"+(info.note||""));
+    });
+    if(clips.length>1){
+      note("warn",UI_T("MULTI_CLIP"));
+    } else {
+      var c2=clips[0], info2=clipInfo(c2);
+      if(info2.lo===null && info2.hi===null){
+        refs.push({label:T("笔夹刻印「","Clip imprint \"")+info2.name+T("」","\""), text:UI_T("REF_CLIP_NODATA")});
+      } else {
+        // 关键：lo 为 null ≠ lo 为 0 年，缺下限就只取上限、绝不默认成 0。
+        // noCap 只表示「上限不可信」（如 rOtring 刻字 2008 年后复用），此时保留可用的下限。
+        spans.push({kind:"clip",
+                    label:T("笔夹 ","Clip ")+info2.name+"（"+info2.years+"）"+(info2.noCap?T("·上限仅参考"," · upper bound ref. only","・上限は参考のみ"):""),
+                    lo:info2.lo, hi:(info2.noCap?null:info2.hi), noCap:false});
+      }
+      // 互斥规则：笔夹无文字（仅压印圆标）只在全金属 S Metallic 上有实物证据；
+      // 塑料量产款（Special/Tikky F/rOtring T 等）若笔夹完全无字，不是原装特征。
+      if(c2.id==="blank_clip" && m && ["s_metal","gt"].indexOf(m.id)<0){
+        forcedConflict = T("「","\"")+langField(m,"name")+T("」是塑料量产款，笔夹应为 rOtring / W.Germany / Germany 刻字之一 [K1]。笔夹完全无字（仅压印 rOtring 圆标）只在全金属 S Metallic（R502155，1980–1983）上有实物确认 [K8]。请复核：这支笔的金属/塑料材质、笔夹是否被后配或打磨。","\" is a plastic production model; its clip should carry one of rOtring / W.Germany / Germany [K1]. A completely textless clip (embossed rOtring round logo only) is only confirmed on the all-metal S Metallic (R502155, 1980–1983) [K8]. Recheck: is the pen metal or plastic, and was the clip replaced or polished?","」はプラ量産モデルで、クリップは rOtring / W.Germany / Germany のいずれかの刻印のはず [K1]。文字なしクリップ（rOtring 丸ロゴのエンボスのみ）が実物確認されているのはオール金属 S Metallic（R502155、1980–1983）だけ [K8]。金属／プラの材質と、クリップの後付け・研磨を再確認してください。");
+      }
+      // 硬规则：笔夹完全空白（无任何 logo/刻字）= 假货或后配，不参与年代计算。
+      if(c2.id==="blank_fake"){
+        forcedConflict = T("笔夹完全空白（无压印 rOtring 圆标、无 rOtring/W.Germany/Germany 刻字）——所有正品一代 Tikky 笔夹至少有压印圆标或刻字之一。这支笔大概率是假货、笔夹后配，或笔夹被打磨掉了所有标记。不建议作为正品收藏。","The clip is completely blank (no embossed rOtring round logo, no rOtring/W.Germany/Germany marking) — every genuine 1st-gen Tikky clip has at least one. This pen is most likely a fake, has a replaced clip, or the clip was polished clean. Not recommended for collecting as genuine.","クリップが完全無地（rOtring 丸ロゴのエンボスも rOtring/W.Germany/Germany の刻印もない）——正規の初代 Tikky クリップには必ずどちらかがある。この個体は偽物、クリップ後付け、または研磨でマークが消えている可能性が高い。正規品としての収集は推奨しない。");
+      }
+    }
+  }
+
+  if(m && clips.length===0 && (m.hi===null || (m.hi-m.lo)>=10)){
+    note("warn",UI_T("WARN_SPAN"));
+  }
+
+  /* ---------- 口径分歧（同型号多来源区间不同或子版本分段） ---------- */
+  if(m && m.variants && m.variants.length>1){
+    var vt = UI_T("VARIANTS")+"："+T("同一型号存在多套年代口径或子版本区间，页面并列展示、不替你选边 —— ","the same model has multiple dating theories or sub-version ranges; shown side by side without picking for you — ","同一モデルに複数の年代口径またはサブバージョン区間がある。並列表示し、どちらも選ばない —— ")
+      + m.variants.map(function(v){ return langField(v,"label")+" "+v.lo+"–"+v.hi+" "+srcText(v.src); }).join("；")
+      + "。"+T("请按你采信的来源判断。","Judge by whichever source you trust.","信じる出典で判断してください。");
+    note("variant", vt);
+  }
+
+  /* ---------- 已知互斥组合（出现即可疑：换件/拼装/误判型号） ---------- */
+  var barrelIds = (state.barrel||[]);
+  if(barrelIds.indexOf("script_tikky")>=0 && clips.length===1 && clips[0].id==="germany_clip"){
+    forcedConflict = T("花体 Tikky + Germany 刻字的组合，在收藏圈几乎没有实物记录（资深藏家明确「没见过花体 + Germany」）。花体在 1993 前，Germany 在 1993 后才普遍，两者几乎不同期，请复核笔杆与笔夹是否来自两支不同的笔 [K7][K1]。","Script Tikky + Germany: almost no physical record exists in the collector community (a veteran collector explicitly says he has \"never seen script + Germany\"). Script ended before 1993 and Germany only became common after 1993; they barely overlap. Recheck whether the barrel and clip came from two different pens [K7][K1].","筆記体 Tikky＋Germany の組み合わせはコレクター界隈で実物記録がほぼない（ベテランコレクターは「筆記体＋Germany は見たことがない」と明言）。筆記体は 1993 年前、Germany が一般的になるのは 1993 年後で、ほぼ同時期に存在しない。軸とクリップが別々のペンから来ていないか再確認 [K7][K1]。");
+  }
+  if(clips.length===1 && clips[0].id==="wgermany_clip" && (state.marking==="core_035" || state.marking==="core_10")){
+    forcedConflict = T("W. Germany 刻字（最晚约 1995）与 0.35/1.0 标示（1996 起）年代不重叠：请复核标示是否看错（0.3 与 0.35 外观很像）[M4][K6]。","W. Germany (at latest c. 1995) and 0.35/1.0 (from 1996) don't overlap: double-check the marking (0.3 and 0.35 look very similar) [M4][K6].","W. Germany 刻印（遅くとも約 1995）と 0.35/1.0 表記（1996 から）は年代が重ならない：表記の読み間違いがないか再確認（0.3 と 0.35 は見た目が酷似）[M4][K6]。");
+  }
+  if(m && m.id==="tikky2" && state.marking==="core_09"){
+    forcedConflict = T("Tikky II（1997/98 起）不产 0.9mm——0.9 只存在于第一代 Special（1983–1996），1996 白色套装切换期起改标 1.0（同芯径）。请复核型号或笔径标示 [M4][N2][K5]。","Tikky II (from 1997/98) never made 0.9 mm — 0.9 exists only in the 1st-gen Special (1983–1996), renumbered 1.0 at the 1996 switch (same lead). Recheck the model or the lead-size mark [M4][N2][K5].","Tikky II（1997/98 から）は 0.9mm を生産しない——0.9 は初代 Special（1983–1996）のみに存在し、1996 切替期から 1.0 表記（同芯径）。モデルまたは芯径表記を再確認 [M4][N2][K5]。");
+  }
+  if(m && m.id==="rt" && state.marking==="core_10" && clips.length===1 && clips[0].id==="wgermany_clip"){
+    forcedConflict = T("W. Germany 笔夹（最晚约 1995）+ 1.0mm 标示（1996 起）：两者年代不重叠。若笔夹是 Germany 或无标，老 T 后期杆型可以有 1.0。请复核 [M4][K6]。","W. Germany clip (at latest c. 1995) + 1.0 mm mark (from 1996): the dates don't overlap. If the clip is Germany or unmarked, the late old-body T can have 1.0. Recheck [M4][K6].","W. Germany クリップ（遅くとも約 1995）＋1.0mm 表記（1996 から）：年代が重ならない。クリップが Germany か無表記なら、旧ボディ後期 T は 1.0 があり得る。再確認 [M4][K6]。");
+  }
+  if(state.color==="marble_rainbow" && state.marking==="core_10"){
+    forcedConflict = T("彩虹大理石属早期 Special（约 1990 年代上半期），没有 1.0mm 规格——1.0 是 1996 年白色套装才出现的 ISO 标示。请复核配色或笔径标示是否看错 [N3][M4]。","Rainbow marble is an early Special (c. first half of the 1990s) and has no 1.0 mm — 1.0 is the ISO mark that only appeared with the 1996 white set. Recheck the colorway or lead-size mark [N3][M4].","レインボーマーブルは初期 Special（1990 年代前半）で 1.0mm 仕様はない——1.0 は 1996 年ホワイトセットで初出の ISO 表記。配色または芯径表記の見間違いを再確認 [N3][M4]。");
+  }
+  if((state.color==="marble" || state.color==="marble_rainbow") && ring && ring.id!=="no_ring"){
+    forcedConflict = T("Tikky Special 大理石色（含彩虹大理石）是无环形态——大理石生产期（1990 年代）Special 不配有杆身环：红环是 1996 年白色套装才出现的特征，芯径分色环是 1989 年白色套装的特征，其他颜色环也没有大理石实物记载。请复核：这支笔的杆身环是否来自其他款式或后配 [N3][M2][M3][M4]。","Marble-color Tikky Special (including rainbow marble) is a ringless form — Special marble pens (1990s) never carried a barrel ring: the red ring only appeared with the 1996 white set, the lead-size color ring is a 1989 white-set feature, and no marble pen is recorded with any other ring. Recheck whether the ring came from another model or was replaced [N3][M2][M3][M4].","マーブル色の Tikky Special（レインボー含む）はリングなしの形態——マーブル生産期（1990 年代）の Special には軸リングが付かない：赤リングは 1996 年ホワイトセットで初出、芯径別カラーリングは 1989 年ホワイトセットの特徴、他のリング色もマーブルの実物記録はない。リングが別モデル由来か後付けかを再確認してください [N3][M2][M3][M4]。");
+  }
+
+  /* ---------- 交叉计算 ---------- */
+  var lo2=-Infinity, hi2=Infinity;
+  var hasForced = !!forcedConflict;
+  spans.forEach(function(s){
+    if(s.lo!==null && s.lo>lo2) lo2=s.lo;
+    if(!s.noCap && s.hi!==null && s.hi<hi2) hi2=s.hi;
+  });
+
+  var conflict = hasForced || (spans.length>0 && lo2!==-Infinity && hi2!==Infinity && lo2>hi2);
+
+  yearsBox.innerHTML="";
+  if(spans.length===0 && !hasForced){
+    yearsBox.appendChild(document.createTextNode(UI_T("NODATA")));
+    yearsBox.appendChild(el("small",null,"\u3000"+T("只选了无法定年的特征","only undatable features selected","年代を決められない特徴のみ選択")));
+    note("warn",UI_T("WARN_NOFEAT"));
+  } else if(conflict){
+    yearsBox.appendChild(document.createTextNode(UI_T("CONFLICT_HEAD")));
+    var cfl=el("div","conflict-line",T("这些依据互相矛盾，无法合并出区间：","These clues contradict each other and cannot merge into a range:","これらの根拠は互いに矛盾し、区間を統合できません："));
+    spans.forEach(function(s){
+      cfl.appendChild(el("div","conflict-line-item", s.label+" → "+fmtSpan(s.lo, s.hi, false)+"\u3000"));
+    });
+    if(forcedConflict){ cfl.appendChild(el("div","conflict-line-item",forcedConflict)); }
+    cfl.appendChild(el("div","conflict-line-item",UI_T("CONFLICT_CMD")));
+    note("conflict", T("依据矛盾","CONFLICT","矛盾"), {el:cfl});
+  } else {
+    var loOut = (lo2===-Infinity) ? null : lo2;
+    var hiOut = (hi2===Infinity) ? null : hi2;
+    yearsBox.appendChild(document.createTextNode((loOut===null?T("更早","earlier","それ以前"):fmtYear(loOut))+" – "+fmtYear(hiOut)));
+    var crossNote = (spans.length>1) ? T("（"," (")+spans.length+T(" 项依据交叉）"," clues crossed)"," 件の根拠をクロス）") : T("（单一依据）"," (single clue)","（単一根拠）");
+    yearsBox.appendChild(el("small",null," "+spans.map(function(s){return s.label;}).join(" · ")+crossNote));
+    if(spans.length===1 && clips.length<=1){
+      note("warn",T("当前只有一个可交叉的依据（","Only one crossable clue now (").replace(/（）.*$/,"")+spans[0].label.replace(/（.*$/,"")+T("），结果等于该依据本身的区间。继续勾选其他特征才能收窄。","), so the result equals that clue's own range. Select more features to narrow it.","）。結果はその根拠自体の区間と同じ。他の特徴を選ぶと絞り込めます。"));
+    }
+  }
+
+  /* ---------- 参考依据提示 ---------- */
+  if(refs.length){
+    note("ref", UI_T("REF_HEAD") + refs.map(function(r){ return r.label+"——"+r.text; }).join("；"));
+  }
+
+  /* ---------- 渲染提示 ---------- */
+  notes.forEach(function(n){
+    if(n.el){ detail.appendChild(n.el); return; }
+    var div;
+    if(n.kind==="conflict") div=el("div","conflict-line",n.text);
+    else if(n.kind==="theory") div=el("div","note-line",n.text);
+    else div=el("div","note-line",n.text);
+    detail.appendChild(div);
+  });
+
+  body.innerHTML="";
+  body.appendChild(kicker);
+  body.appendChild(yearsBox);
+  body.appendChild(detail);
+}
+
+function addRow(detail,key,val){
+  var row=el("div","detail-row");
+  row.appendChild(el("div","detail-key",key));
+  var v=el("div","detail-val");
+  v.textContent=val;
+  row.appendChild(v);
+  detail.appendChild(row);
+}
+
+/* ================= 静态区块 ================= */
+function buildTheoryBar(){
+  var bar=document.getElementById("theory-bar");
+  if(!bar) return;
+  bar.innerHTML="";
+  var lab=el("span","label",T("笔夹刻字采用哪套口径：","Which clip theory to use:","クリップ刻印はどの口径を使う："));
+  bar.appendChild(lab);
+  ["B","A","C"].forEach(function(k){
+    var th=THEORY[k];
+    var b=el("button","theory-btn",langField(th,"name"));
+    b.type="button";
+    b.setAttribute("data-theory", k);
+    b.setAttribute("aria-pressed", k===state.theory ? "true":"false");
+    b.addEventListener("click", function(){
+      state.theory=k;
+      syncChips();
+      buildRules();
+      renderResult();
+    });
+    bar.appendChild(b);
+  });
+}
+
+function buildRules(){
+  var grid=document.getElementById("rule-grid");
+  grid.innerHTML="";
+  CLIPS.forEach(function(c){
+    var info2=clipInfo(c);
+    var card=el("div","rule-card");
+    var mark=el("div","rule-mark");
+    if(c.id==="blank_clip") mark.classList.add("blank");
+    if(c.id==="wgermany_clip") mark.classList.add("wg");
+    mark.textContent=langField(c,"name");
+    var info=el("div","rule-info");
+    var b=el("b",null,info2.years);
+    if(info2.noCap) b.appendChild(el("span","tag-ref",UI_T("REFONLY")+"·"+T("不截断上限","no upper bound","上限を確定しない")));
+    info.appendChild(b);
+    info.appendChild(el("span",null,(langField(c,"note")||"")+" "+srcText(c.src)));
+    var arrow=el("div","rule-arrow","→");
+    card.appendChild(mark); card.appendChild(info); card.appendChild(arrow);
+    grid.appendChild(card);
+  });
+  var hintBox=document.getElementById("theory-note");
+  if(hintBox){
+    hintBox.textContent=langField((THEORY[state.theory]||THEORY.B),"note");
+  }
+}
+
+/* 说明与边界（20 条，三语） */
+var NOTES = [
+ {zh:"所有年代都是「区间」，红环官方没有单支笔的生产批号记录，无法精确到具体年份。",
+  en:"All dates are ranges. rOtring officially keeps no per-pen batch records, so an exact year is impossible.",
+  ja:"すべての年代は「区間」。rOtring 公式には一本単位の生産ロット記録がなく、正確な年までは特定できない。"},
+ {zh:"「口径分歧」：同一型号在不同来源有不同年代区间时，页面并列列出全部口径，不替用户选边。典型例子是 Tikky Special 初代——Knockology 口径 1983–1998，「文具病」图示口径 1984–1988，两者相差达十年，会直接改变一支绿杆 Special 的断代结论。同类分歧还有：rOtring S（时间轴 1981–1988 vs 视频 1979–1985）、S Metallic（时间轴 1983–1988 vs 视频 1979–约1990）、Tikky Automatic（Knockology 1988–1992 vs 视频/德国目录 1987–1992）、Automatic LS（rOtring Museum 1987–1993 vs 视频 1988 发布；红环起点另有 rOtring Museum 1988 / Heath 帖 1990 两说）。YouTube 博主 Mechanical Pencils 的完整年表（含 GT v1/v2、Rotring 400、Esprit）已并入型号表，Heath 的《rOtring automatics》年表帖与 1984 年目录实物为独立旁证，页面全部按「单源/多源」标注，你可自行判断采信哪套。",
+  en:"\"Variant opinions\": when a model has different date ranges across sources, all are listed side by side — the page doesn't pick for you. The classic case is the first Tikky Special: Knockology says 1983–1998 while Stationeria's chart says 1984–1988 — a ten-year gap that changes the dating of a green Special. Similar splits: rOtring S (timeline 1981–1988 vs video 1979–1985), S Metallic (timeline 1983–1988 vs video 1979–c.1990), Tikky Automatic (Knockology 1988–1992 vs video/German catalog 1987–1992), Automatic LS (rOtring Museum 1987–1993 vs video 1988 debut; red-ring start also has rOtring Museum 1988 / Heath 1990). Mechanical Pencils' full timeline (incl. GT v1/v2, Rotring 400, Esprit) is merged into the model table; Heath's automatics thread and the 1984 catalog are independent corroboration. Everything is labeled single/multi-source for you to judge.",
+  ja:"「口径の相違」：同一モデルで出典により年代区間が異なる場合、全口径を並列表示し、ページはどちらも選ばない。典型例は初代 Tikky Special——Knockology は 1983–1998、文具病の図解は 1984–1988 で十年の開きがあり、緑軸 Special の断代結論を直接左右する。同種の相違：rOtring S（タイムライン 1981–1988 vs 動画 1979–1985）、S Metallic（1983–1988 vs 動画 1979–約1990）、Tikky Automatic（Knockology 1988–1992 vs 動画／ドイツ目録 1987–1992）、Automatic LS（rOtring Museum 1987–1993 vs 動画 1988 発売；赤リング開始は rOtring Museum 1988／Heath 1990 の二説）。Mechanical Pencils の完全年表（GT v1/v2、Rotring 400、Esprit 含む）はモデル表に統合済み。Heath の automatics 年表スレッドと 1984 年目録実物は独立の傍証。すべて「単源／多源」で表示し、どれを採るかはユーザー自身が判断する。"},
+ {zh:"笔夹刻字也有三套口径（B 工程师 / A 行业规律 / C 日本实测），差异集中在 W. Germany 的结束年（1990 与 1995 相差五年）。结果区上方的切换会同时改变对照表与判定结果；三套口径的共识只有「W. Germany ⇒ 1995 之前」「Germany ⇒ 1990 之后」。",
+  en:"Clip imprints also have three theories (B engineer / A industry rule / C Japan test), differing mainly on W. Germany's end year (1990 vs 1995). The switch above the result updates both the table and the result; the only consensus is \"W. Germany ⇒ before 1995\" and \"Germany ⇒ after 1990\".",
+  ja:"クリップ刻印にも三口径（B 技術者／A 業界通則／C 日本実測）があり、差は W. Germany の終了年に集中（1990 と 1995 で五年差）。結果欄上の切替で対照表と判定結果が同時に変わる。三口径の共通認識は「W. Germany ⇒ 1995 以前」「Germany ⇒ 1990 以降」のみ。"},
+ {zh:"笔杆 logo 字体：圆润（圆头端点）为早期、有棱角为后期；Dux 的口径是 1993 年换粗体。花体与粗体在 1990–1993 有重叠期，所以两者都是「软边界」，不能单独定年 [N3][K7]。",
+  en:"Barrel logo lettering: rounded (round terminals) = early, angular = late; Dux says the bold switch came in 1993. Script and bold overlapped in 1990–1993, so both are \"soft boundaries\" and can't date a pen alone [N3][K7].",
+  ja:"軸ロゴの書体：丸み（丸端）は初期、角ばったのは後期。Dux 口径では 1993 年に太字へ変更。筆記体と太字は 1990–1993 に重複期があり、どちらも「ソフトな境界」で単独では年代を決められない [N3][K7]。"},
+ {zh:"笔径（芯径）是硬年代指标：早期德系标 0.3 与 0.9，1996 年白色套装起 0.3→0.35、0.9→1.0（1.0 与 0.9 是同一物理芯径的 ISO/德系两种标法，一代大理石末期亦有 1.0 实物）。其中 <b>0.9 只在第一代存在</b>（1996 白色套装切换期起改标 1.0），看到 0.9 可直接排除第二代及以后；<b>0.35 可直接锁定 1996 年之后</b>，与 W. Germany 笔夹不可能共存。0.5 与 0.7 贯穿全系，本身不带年代信号 [M4][N2][K5]。",
+  en:"Lead size is a hard dating clue: early German pens marked 0.3 and 0.9; from the 1996 white set, 0.3→0.35 and 0.9→1.0 (1.0 and 0.9 are the same physical lead under ISO/German marking; late-1st-gen marble pens exist in 1.0). <b>0.9 exists only in the 1st gen</b> (renumbered 1.0 at the 1996 switch), so a 0.9 rules out the 2nd gen onward; <b>0.35 pins the pen after 1996</b> and cannot coexist with a W. Germany clip. 0.5 and 0.7 run through the whole line and carry no dating signal [M4][N2][K5].",
+  ja:"芯径は強い年代指標：初期ドイツ製は 0.3 と 0.9、1996 年ホワイトセットから 0.3→0.35、0.9→1.0（1.0 と 0.9 は同一物理芯径の ISO／ドイツ表記。初代末期マーブルにも 1.0 実物あり）。うち <b>0.9 は初代のみ</b>（1996 切替期から 1.0 表記）で、0.9 があれば第 2 世代以降を除外できる。<b>0.35 は 1996 年以降を確定</b>し、W. Germany クリップとは共存不可能。0.5 と 0.7 は全シリーズにあり、年代信号を持たない [M4][N2][K5]。"},
+ {zh:"笔径核实不用拆笔：笔尖横纹数（0 条=0.5、1 条=0.3/0.35、2 条=0.7、3 条=0.9/1.0）；内部出芯机构塑料色（红/黑/蓝/透明）要拆开才看得到。早期印字颜色（0.3 黄字、0.9 橙字）为文具病单源记载 [M4][N2]。",
+  en:"No disassembly needed: count tip ridges (0 = 0.5, 1 = 0.3/0.35, 2 = 0.7, 3 = 0.9/1.0); the inner feed plastic color (red/black/blue/clear) requires opening. Early imprint colors (0.3 yellow, 0.9 orange) are single-source (Stationeria) [M4][N2].",
+  ja:"分解不要の芯径確認：ペン先横線の数（0 本=0.5、1 本=0.3/0.35、2 本=0.7、3 本=0.9/1.0）。内部機構のプラ色（赤/黒/青/透明）は分解が必要。初期印字色（0.3 黄字、0.9 橙字）は文具病のみの記録 [M4][N2]。"},
+ {zh:"货号是最硬的系列判据：rOtring 官方分 T 系列 = 502 06X、Tikky = 502 10X、TS Slide = 502 20X、Automatic LS = 502 190；能在笔杆或包装上读到 502 段号，就能直接定系列 [N4]。",
+  en:"The article number is the hardest series clue: official blocks are T = 502 06X, Tikky = 502 10X, TS Slide = 502 20X, Automatic LS = 502 190. If you can read a 502-series number on the barrel or packaging, the series is settled [N4].",
+  ja:"品番が最も確実なシリーズ判据：公式区分は T シリーズ＝502 06X、Tikky＝502 10X、TS Slide＝502 20X、Automatic LS＝502 190。軸かパッケージで 502 番台が読めれば、シリーズが確定する [N4]。"},
+ {zh:"红环（杆身色环）不能单独定年：一代 Special 多数没有红环，红环只出现在部分早期批次，且白 Special 存在圆角环/棱角环/无环三种；环的形状才是弱信号 [N2][N3]。",
+  en:"The red ring can't date a pen alone: most 1st-gen Specials have none; the ring appears only on some early batches, and the white Special comes in rounded-ring/angular-ring/no-ring variants — the ring shape is the weak signal [N2][N3].",
+  ja:"赤リング単独では年代を決められない：初代 Special の大半にはなく、一部の初期ロットのみ。白 Special には丸角リング／角形リング／なしの三種があり、リングの形状が弱い信号 [N2][N3]。"},
+ {zh:"大理石配色只出现在 Tikky Special 世代内，文具病实测口径为 <b>1990 年代</b>；<b>颜色有很多种</b>，无权威清单。纹路每支不同，彩虹大理石最稀有 [N3]。粉大理石另有藏家 early 1990s 记载。",
+  en:"Marble exists only within the Tikky Special era; Stationeria's tested theory is the <b>1990s</b>; <b>many colors exist</b> with no authoritative list. Every grain is unique; rainbow marble is the rarest [N3]. Pink marble also has a collector \"early 1990s\" note.",
+  ja:"マーブル配色は Tikky Special 世代のみ。文具病の実測口径は<b>1990 年代</b>。<b>色は非常に多い</b>が権威あるリストはない。模様は一本ずつ異なり、レインボーマーブルが最希少 [N3]。ピンクマーブルはコレクターの early 1990s 記録もある。"},
+ {zh:"木屑款与珠光款（含灰色亮片/云母灰）同属 1990 年代 Special 特殊材质款；木屑据观察仅单色，且几乎每支都会变形歪杆，这是材质通病而非使用损伤 [N3]。",
+  en:"Woodchip and pearlescent (incl. grey glitter / mica grey) are both 1990s Special special-material versions; woodchip is observed in one color only, and nearly every piece warps — a material trait, not damage [N3].",
+  ja:"木屑とパール（グレーラメ／マイカグレー含む）はどちらも 1990 年代 Special の特殊素材版。木屑は観察上単色のみで、ほぼすべての個体が曲がる——これは材質上の通弊で、使用損傷ではない [N3]。"},
+ {zh:"笔杆印刷通常只有 rOtring + Tikky + 型号 + 线径，不含产地字样；产地信息主要在笔夹刻字上。",
+  en:"Barrel printing is usually just rOtring + Tikky + model + lead size, with no country mark; country info lives mainly on the clip imprint.",
+  ja:"軸の印刷は通常 rOtring＋Tikky＋モデル＋芯径のみで、産地表記はない。産地情報は主にクリップ刻印にある。"},
+ {zh:"官方称 Tikky 1979 年首发；但你此前翻查 1980 年德文官方目录未见 Tikky 自动铅笔，官方年代与目录实物存在出入，页面保留两种信息。",
+  en:"Officially, Tikky debuted in 1979; but the 1980 German official catalog you checked shows no Tikky mechanical pencil. The official date and the catalog diverge, so both are kept here.",
+  ja:"公式は 1979 年初出としているが、1980 年ドイツ語公式カタログを調べても Tikky シャープペンは見当たらない。公式年代とカタログ実物に開きがあるため、両方の情報を残す。"},
+ {zh:"笔夹刻字只能给出刻字时期，不等于整支笔的生产区间；两者交叉才能收窄范围。同一刻字可能横跨多个年代（如 rOtring 刻字 2008 年后又被现代款复用），所以交叉时旧刻字只作参考、不参与截断上限。",
+  en:"A clip imprint only dates the imprint period, not the whole pen; crossing both narrows the range. One imprint can span eras (e.g. the rOtring marking reused by modern models after 2008), so in cross-dating an old imprint is reference only and never caps the upper bound.",
+  ja:"クリップ刻印は刻印時期を示すだけで、ペン全体の生産区間ではない。両者をクロスして範囲を絞る。同一刻印が複数年代に跨ることもある（rOtring 刻印は 2008 年以降の現行モデルで再使用）ため、クロスの際は古い刻印を参考のみとし、上限を確定しない。"},
+ {zh:"「无标」笔杆与「无标」笔夹无法单独定年，页面会明确提示。",
+  en:"An unmarked barrel or clip can't date a pen; the page says so explicitly.",
+  ja:"「無表記」の軸とクリップは単独では年代を決められない。ページが明示的に注意する。"},
+ {zh:"大理石花纹为生产时随机成型，每支纹理都不同，不能靠纹路定年。",
+  en:"Marble grain forms randomly during production — every pen differs, so grain can't date a pen.",
+  ja:"マーブル模様は生産時にランダムに成型され、一本ずつ異なる。模様で年代は決められない。"},
+ {zh:"颜色为单选联动：选定型号后，该型号没有记载的配色会置灰禁用；缺年代记载的配色不参与交叉，页面只列参考。",
+  en:"Colors are single-select and linked: once a model is picked, colorways it never came in are greyed out; colors without dating don't cross-date and are listed as reference.",
+  ja:"色は単一選択の連動：モデルを選ぶと、そのモデルに記録のない配色はグレーで無効化。年代記録のない配色はクロス対象外で、参考表示のみ。"},
+ {zh:"「Tikky」名字考源：rOtring 1928 年首款量产针管笔叫 Tintenkuli（墨水笔），简称 Tiku；同设计族的铅笔叫 Bleikuli（铅笔）、滚珠笔叫 Rollkuli。收藏圈推测 Tikky 取自按动出芯的「click」声、做轻盈化命名 [K11][K1]。模型代号含义：proto-Tikky 的 T=technical（技术笔）、S=sliding sleeve（滑动护芯管）、F=fixed sleeve（固定护芯管）；GT 含义无定论（收藏圈玩笑有 Gran Turismo / Gel tip 等说法）[K1 第 2 页]。",
+  en:"The name \"Tikky\": rOtring's 1928 mass-produced technical pen was the Tintenkuli, short for Tiku; the same design family's pencil was Bleikuli and ballpoint Rollkuli. Collectors suspect Tikky comes from the \"click\" of lead advance, lightened into a name [K11][K1]. Proto model letters: T = technical, S = sliding sleeve, F = fixed sleeve; GT is unsettled (jokes include Gran Turismo / Gel tip) [K1 p.2].",
+  ja:"「Tikky」の名前の由来：rOtring は 1928 年に初の量産テクニカルペン Tintenkuli（略称 Tiku）を発売。同デザインファミリーの鉛筆は Bleikuli、ボールペンは Rollkuli。コレクター界隈では、芯出しの「クリック」音から軽やかに命名されたと推測 [K11][K1]。プロトの型番字：T＝technical（テクニカルペン）、S＝sliding sleeve（スライドパイプ）、F＝fixed sleeve（固定パイプ）。GT の意味は未確定（Gran Turismo／Gel tip など冗談説あり）[K1 2 ページ目]。"},
+ {zh:"待考证项：作者本人时间轴图 v12 在 2020 年位置标注「Tikky S-in-T」字样，但全站与公开资料暂未找到第二来源、实物或目录佐证，页面不纳入判定，仅记录此线索 [K6]。",
+  en:"Unverified: the author's own timeline v12 marks \"Tikky S-in-T\" at the 2020 position, but no second source, physical example or catalog confirms it anywhere. The page excludes it from dating and only records the lead [K6].",
+  ja:"未検証：作者自身のタイムライン図 v12 が 2020 年の位置に「Tikky S-in-T」と記すが、全サイトと公開資料に第二の出典・実物・カタログ裏付けがない。ページは判定に含めず、手がかりとして記録のみ [K6]。"},
+ {zh:"帽顶形状证据链：圆树脂帽顶（丸い樹脂）——日文 bungu-talk 明确记载初版 rOtring T（小豆色轴）与 rOtring S 都有，白杆三硬度套也有；1984 年新版 T 明确改回「普通金属帽」，TS slide 存在树脂被移除的版本差异 [N6]；圆顶（dome）——主帖 Criterium 描述 Tikky metallic S 为 domed eraser cap [K1]；彩色帽顶——1996 白色套装官方记载为「新增、便于区分」[M4]；镂空/棱角——bungu-talk 记载 Esprit（1997）帽顶改有棱角形状 [N6]。一代塑料款只有实心金属帽（圆/平）与早期树脂圆顶两种正规形态，其余组合提示后换件。",
+  en:"Cap-top evidence chain: round resin top (丸い樹脂) — bungu-talk explicitly records it on the first rOtring T (bean-red barrel) and rOtring S, and the white 3-hardness set; the 1984 new T went back to a \"plain metal cap\", and the TS Slide has a resin-removed variant [N6]. Dome — main-thread Criterium calls the Tikky metallic S a \"domed eraser cap\" [K1]. Colored cap — the 1996 white set officially notes it as \"new, for distinction\" [M4]. Cutout/angular — bungu-talk records the Esprit (1997) cap turning angular [N6]. 1st-gen plastic models have only two regular forms — solid metal cap (dome/flat) and the early resin dome; other combos flag a replaced part.",
+  ja:"キャップ先端の証拠連鎖：丸い樹脂——bungu-talk が初版 rOtring T（小豆色軸）と rOtring S、白軸 3 硬度セットに明記。1984 年新 T は「普通の金属キャップ」に明確に戻り、TS Slide には樹脂を外した版差あり [N6]。ドーム——メインスレッドの Criterium が Tikky metallic S を「domed eraser cap」と記述 [K1]。カラーキャップ——1996 年ホワイトセットは公式に「新規・区別のため」[M4]。中空／角形——bungu-talk が Esprit（1997）のキャップ先端が角ばった形に変わったと記録 [N6]。初代プラモデルの正規形態は、中実金属キャップ（ドーム／フラット）と初期の樹脂ドームの二種のみ。それ以外の組み合わせは後付け部品を疑う。"},
+ {zh:"1996 年官方目录 PDF（rotringsrbija 归档）为纯图像扫描，无文字层，页码内货号需人工翻阅，故未纳入自动判定。",
+  en:"The 1996 official catalog PDF (rotringsrbija archive) is a pure image scan with no text layer; article numbers inside need manual page-turning, so it's excluded from automatic judging.",
+  ja:"1996 年公式カタログ PDF（rotringsrbija アーカイブ）は文字レイヤーのない純画像スキャン。ページ内の品番は手動でめくって確認する必要があるため、自動判定には組み込んでいない。"}
+];
+function buildNotes(){
+  var ul=document.getElementById("notes-list");
+  if(!ul) return;
+  ul.innerHTML="";
+  NOTES.forEach(function(n){
+    var li=el("li",null,T(n.zh,n.en,n.ja));
+    ul.appendChild(li);
+  });
+}
+
+function buildSources(){
+  var ul=document.getElementById("src-list");
+  ul.innerHTML="";
+  SOURCES.forEach(function(s){
+    var li=el("li");
+    li.appendChild(el("span","idx",s.key));
+    var a=el("a",null,langField(s,"label"));
+    a.href=s.url; a.target="_blank"; a.rel="noopener";
+    li.appendChild(a);
+    ul.appendChild(li);
+  });
+  var note=document.getElementById("src-note");
+  if(note){
+    var keys=SOURCES.map(function(s){return s.key;}).join("／");
+    note.textContent=UI_T("SRC_LABEL").replace("{n}",SOURCES.length).replace("{keys}",keys);
+  }
+  var chip=document.getElementById("meta-chip");
+  if(chip){
+    chip.innerHTML="";
+    var row1=el("span",null,"v1.3 · by STH · alxdshen@qq.com");
+    var row2=el("span",null,UI_T("META").replace("{date}","2026-10-24").replace("{n}",SOURCES.length));
+    chip.appendChild(row1); chip.appendChild(row2);
+  }
+}
+
+/* ================= 初始化 ================= */
+/* 常见型号白名单：其余默认折叠，避免新手被16个按钮淹没 */
+var COMMON_MODELS = ["tikky_f","rt","special"];
+var ALL_MODELS = MODELS.concat(EXTRA_MODELS);
+buildChips("chips-model", ALL_MODELS.filter(function(m){return COMMON_MODELS.indexOf(m.id)>=0;}), "model", false);
+buildChips("chips-model-rare", ALL_MODELS.filter(function(m){return COMMON_MODELS.indexOf(m.id)<0;}), "model", false);
+(function(){
+  var toggle=document.getElementById("model-toggle");
+  var rare=document.getElementById("chips-model-rare");
+  var label=toggle.querySelector(".chip-toggle-label");
+  toggle.addEventListener("click",function(){
+    var open=toggle.getAttribute("aria-expanded")==="true";
+    toggle.setAttribute("aria-expanded", String(!open));
+    rare.classList.toggle("hidden", open);
+    label.textContent = open
+      ? UI_T("TOGGLE_OPEN")
+      : UI_T("TOGGLE_CLOSE");
+  });
+})();
+buildChips("chips-color", COLORS, "color", false);
+buildChips("chips-barrel", BARRELS, "barrel", true);
+buildChips("chips-clip", CLIPS, "clip", true);
+buildChips("chips-ring", RINGS, "ring", false);
+buildChips("chips-marking", MARKINGS, "marking", false);
+buildChips("chips-sleeve", SLEEVES, "sleeve", false);
+buildChips("chips-cap", CAPS, "cap", false);
+buildTheoryBar();
+buildRules();
+buildSources();
+buildNotes();
+
+document.getElementById("btn-reset").addEventListener("click",function(){
+  state={model:null,color:null,barrel:[],clip:[],ring:null,marking:null,sleeve:null,cap:null,theory:state.theory};
+  syncChips();
+  buildRules();
+  renderResult();
+});
+renderResult();
+</script>
+</body>
+</html>
