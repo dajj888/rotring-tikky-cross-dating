@@ -8,7 +8,7 @@ Cross-check the production era and authenticity of your Tikky by selecting its f
 
 - **Trilingual UI**: English / 中文 / 日本語 (switch in the top-right corner)
 - **Multi-criterion cross-checking**: model, color, imprint, clip, cap, tip ridges, internal plastic color
-- **Cross-referenced dating**: three independent chronologies are compared (A: industry rules, B: rOtring Museum engineer statements, C: Japanese collector实测)
+- **Cross-referenced dating**: three independent chronologies are compared (A: industry rules, B: rOtring Museum engineer statements, C: Japanese collector's hands-on test)
 - **Traceable sources**: every claim is tagged with a source key and linked to its original page (Knockology threads, rOtring Museum, Stationeria, bungu-talk, 1996 official catalog)
 - **No guessing**: combinations with no reliable record are marked "No reliable data"
 
